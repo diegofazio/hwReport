@@ -16,7 +16,7 @@
       
       <PictureObject Name="LogoImg" Left="18.9" Top="56.7" Width="103.95" Height="75.6" Border.Lines="All" Border.Color="Gainsboro"/>
       
-      <TextObject Name="TxtInfo" Left="132.3" Top="56.7" Width="302.4" Height="75.6" Text="Este reporte demuestra todas las capacidades de la integracion:&#13;&#10;- Imagenes dinamicas&#13;&#10;- Codigos QR / Barras&#13;&#10;- Tablas via JSON&#13;&#10;- Manipulacion de objetos" Font="Arial, 9pt"/>
+      <TextObject Name="TxtInfo" Left="132.3" Top="56.7" Width="302.4" Height="75.6" Text="This report demonstrates all integration capabilities:&#13;&#10;- Dynamic images&#13;&#10;- QR / Bar codes&#13;&#10;- JSON-based tables&#13;&#10;- Object manipulation" Font="Arial, 9pt"/>
       
       <BarcodeObject Name="QrCode" Left="463.05" Top="56.7" Width="85.05" Height="85.05" Expression="&quot;https://harbour.github.io/&quot;" Barcode="QR Code"/>
       <BarcodeObject Name="BarCode128" Left="557.55" Top="66.15" Width="141.75" Height="56.7" Expression="&quot;1234567890&quot;" Barcode="Code128"/>
@@ -24,8 +24,8 @@
     
     <PageHeaderBand Name="PageHeader1" Top="174.1" Width="718.2" Height="28.35">
       <TextObject Name="Text2" Left="18.9" Width="94.5" Height="28.35" Border.Lines="All" Border.Color="Gainsboro" Fill.Color="SteelBlue" Text="ID" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" TextFill.Color="White"/>
-      <TextObject Name="Text3" Left="113.4" Width="444.15" Height="28.35" Border.Lines="All" Border.Color="Gainsboro" Fill.Color="SteelBlue" Text="DESCRIPCION" VertAlign="Center" Font="Arial, 10pt, style=Bold" TextFill.Color="White"/>
-      <TextObject Name="Text4" Left="557.55" Width="141.75" Height="28.35" Border.Lines="All" Border.Color="Gainsboro" Fill.Color="SteelBlue" Text="VALOR" HorzAlign="Right" VertAlign="Center" Font="Arial, 10pt, style=Bold" TextFill.Color="White"/>
+      <TextObject Name="Text3" Left="113.4" Width="444.15" Height="28.35" Border.Lines="All" Border.Color="Gainsboro" Fill.Color="SteelBlue" Text="DESCRIPTION" VertAlign="Center" Font="Arial, 10pt, style=Bold" TextFill.Color="White"/>
+      <TextObject Name="Text4" Left="557.55" Width="141.75" Height="28.35" Border.Lines="All" Border.Color="Gainsboro" Fill.Color="SteelBlue" Text="VALUE" HorzAlign="Right" VertAlign="Center" Font="Arial, 10pt, style=Bold" TextFill.Color="White"/>
     </PageHeaderBand>
     
     <DataBand Name="Data1" Top="206.45" Width="718.2" Height="28.35" DataSource="Data">

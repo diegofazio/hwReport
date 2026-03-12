@@ -5,47 +5,47 @@
 #endif
 
 /*
-   EJEMPLO 01: FACTURACION CON DATOS JSON
-   Demuestra como enviar un set de datos complejo (una tabla con lineas de detalle)
-   desde Harbour a FastReport sin necesidad de archivos DBF intermedios.
+   EXAMPLE 01: INVOICING WITH JSON DATA
+   Demonstrates how to send a complex dataset (a table with line items)
+   from Harbour to FastReport without the need for intermediate DBF files.
 */
 
 FUNCTION Main()
     LOCAL oFR
     LOCAL cJson, lSuccess
 
-    ? "SAMPLES: Facturacion con JSON"
+    ? "SAMPLES: JSON Invoicing"
 
     oFR := win_oleCreateObject( "hwReport.FastReport" )
 
     IF .NOT. oFR:LoadReport( "01_json_invoice.frx" )
-        ? "Error cargando reporte: " + oFR:GetLastError()
+        ? "Error loading report: " + oFR:GetLastError()
         RETURN NIL
     ENDIF
 
-    // Creamos un JSON que simula los items de una factura
-    // FastReport lo tratara como una tabla llamada 'Items'
+    // Create a JSON string simulating invoice line items
+    // FastReport will treat this as a table named 'Items'
     cJson := '[' + ;
-        '{"ITEM": "1", "DESC": "Servicios de Consultoria", "TOTAL": 1500.00},' + ;
-        '{"ITEM": "2", "DESC": "Licencia de Software", "TOTAL": 250.00},' + ;
-        '{"ITEM": "3", "DESC": "Implementacion COM/OLE", "TOTAL": 500.00}' + ;
+        '{"ITEM": "1", "DESC": "Consultancy Services", "TOTAL": 1500.00},' + ;
+        '{"ITEM": "2", "DESC": "Software License", "TOTAL": 250.00},' + ;
+        '{"ITEM": "3", "DESC": "COM/OLE Implementation", "TOTAL": 500.00}' + ;
     ']'
 
-    // Registramos los datos
-    ? "Registrando datos JSON..."
+    // Registering the data
+    ? "Registering JSON data..."
     IF .NOT. oFR:RegisterJsonData( "Items", cJson )
-        ? "Error en JSON: " + oFR:GetLastError()
+        ? "JSON Error: " + oFR:GetLastError()
     ENDIF
 
-    // Seteamos una variable global para el reporte
-    oFR:SetParameter( "Cliente", "CLIENTE DE PRUEBA S.A." )
-    oFR:SetParameter( "NumFac", "A-0001-00000123" )
+    // Set global parameters for the report
+    oFR:SetParameter( "Cliente", "TEST CUSTOMER LTD." )
+    oFR:SetParameter( "NumFac", "INV-2026-00000123" )
 
-    ? "Iniciando Visualizador..."
+    ? "Launching Viewer..."
     IF oFR:ShowPreview()
-       ? "Success! PDF generado en: " + oFR:GetLastError()
+       ? "Success! PDF generated at: " + oFR:GetLastError()
     ELSE
-       ? "Error en Visualizador: " + oFR:GetLastError()
+       ? "Viewer Error: " + oFR:GetLastError()
     ENDIF
 
     oFR := NIL

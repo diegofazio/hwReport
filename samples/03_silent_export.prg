@@ -5,32 +5,32 @@
 #endif
 
 /*
-   EJEMPLO 03: EXPORTACION SILENCIOSA (BACKGROUND)
-   Genera un PDF sin mostrar ventana alguna al usuario.
-   Util para procesos batch o envio de correos automaticos.
+   EXAMPLE 03: SILENT EXPORT (BACKGROUND)
+   Generates a PDF without showing any window to the user.
+   Useful for batch processes or automated email sending.
 */
 
 FUNCTION Main()
     LOCAL oFR
-    LOCAL cPath := "C:\harbour\contrib\hwReport\samples\Reporte_Generado.pdf"
+    LOCAL cPath := "C:\harbour\contrib\hwReport\samples\Generated_Report.pdf"
 
-    ? "SAMPLES: Exportando PDF en segundo plano..."
+    ? "SAMPLES: Exporting PDF in background..."
 
     oFR := win_oleCreateObject( "hwReport.FastReport" )
     
     IF .NOT. oFR:LoadReport( "03_silent_export.frx" )
-        ? "Error cargando reporte: " + oFR:GetLastError()
+        ? "Error loading report: " + oFR:GetLastError()
         RETURN NIL
     ENDIF
 
-    // Registramos datos para que el reporte tenga contenido y no falle el motor de script
-    oFR:RegisterJsonData( "Items", '[{"DESC": "Item Exportacion 1", "TOTAL": 100.00}]' )
-    oFR:SetParameter( "Cliente", "EXPORTADOR SILENCIOSO" )
+    // Register data so the report has content and doesn't trigger engine errors
+    oFR:RegisterJsonData( "Items", '[{"DESC": "Export Item 1", "TOTAL": 100.00}]' )
+    oFR:SetParameter( "Cliente", "SILENT EXPORTER" )
 
-    // ExportToPdf( RutaFile, AbrirDespues )
-    // Pasamos .F. para que NO se abra el visor al finalizar
+    // ExportToPdf( filePath, openAfter )
+    // Pass .F. so the viewer does NOT open upon completion
     IF oFR:ExportToPdf( cPath, .F. )
-        ? "EXITO: El archivo se ha creado silenciosamente en:"
+        ? "SUCCESS: File has been created silently at:"
         ? cPath
     ELSE
         ? "ERROR: " + oFR:GetLastError()

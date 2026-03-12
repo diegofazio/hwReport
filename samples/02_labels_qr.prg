@@ -5,16 +5,16 @@
 #endif
 
 /*
-   EJEMPLO 02: ETIQUETAS Y CODIGOS QR / BARRAS
-   Demuestra como manipular especificamente objetos de tipo Barcode o QR
-   en tiempo de ejecucion desde Harbour.
+   EXAMPLE 02: LABELS AND QR / BAR CODES
+   Demonstrates how to specifically manipulate Barcode or QR objects
+   at runtime from Harbour.
 */
 
 FUNCTION Main()
     LOCAL oFR
-    LOCAL cQrData := "https://miempresa.com/serial/ABC-123-XYZ"
+    LOCAL cQrData := "https://mycompany.com/serial/ABC-123-XYZ"
 
-    ? "SAMPLES: Etiquetas con QR"
+    ? "SAMPLES: QR Labels"
 
     oFR := win_oleCreateObject( "hwReport.FastReport" )
 
@@ -23,13 +23,13 @@ FUNCTION Main()
         RETURN NIL
     ENDIF
 
-    ? "Asignando datos al QR..."
+    ? "Assigning data to QR code..."
     oFR:SetParameter( "qr", cQrData )
     oFR:SetParameter( "Text1", "SERIAL: ABC-123-XYZ" )
 
-    ? "Iniciando Visualizador..."
+    ? "Launching Viewer..."
     IF .NOT. oFR:ShowPreview()
-        ? "Error en Preview: " + oFR:GetLastError()
+        ? "Preview Error: " + oFR:GetLastError()
     ENDIF
 
     oFR := NIL

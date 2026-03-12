@@ -5,37 +5,37 @@
 #endif
 
 /*
-   EJEMPLO 04: CONTROL DINAMICO DE OBJETOS
-   Muestra como mover, redimensionar y ocultar elementos segun la logica
-   de tu programa Harbour (ej: ocultar firma si no esta autorizado).
+   EXAMPLE 04: DYNAMIC COMPONENT CONTROL
+   Shows how to move, resize, and hide elements based on your 
+   Harbour program logic (e.g., hide signature if not authorized).
 */
 
 FUNCTION Main()
     LOCAL oFR
-    LOCAL lEsUrgente := .T.
+    LOCAL lIsUrgent := .T.
 
-    ? "SAMPLES: Control Dinamico de Objetos"
+    ? "SAMPLES: Dynamic Component Control"
 
     oFR := win_oleCreateObject( "hwReport.FastReport" )
     
     IF .NOT. oFR:LoadReport( "04_dynamic_objects.frx" )
-        ? "Error al cargar: " + oFR:GetLastError()
+        ? "Load Error: " + oFR:GetLastError()
         RETURN NIL
     ENDIF
 
-    // Registramos datos minimos para evitar errores de compilacion del reporte
-    oFR:RegisterJsonData( "Items", '[{"DESC": "Objeto Dinamico", "TOTAL": 0.00}]' )
+    // Register minimum data to avoid report compilation errors
+    oFR:RegisterJsonData( "Items", '[{"DESC": "Dynamic Object", "TOTAL": 0.00}]' )
 
-    IF lEsUrgente
-        // Movemos un objeto de texto a una posicion especifica
-        // SetPosition( NombreObjeto, LeftCM, TopCM, WidthCM, HeightCM )
+    IF lIsUrgent
+        // Move a text object to a specific position
+        // SetPosition( objectName, leftCM, topCM, widthCM, heightCM )
         oFR:SetPosition( "Text1", 10.5, 0.5, 5.0, 2.0 )
-        oFR:SetText( "Text1", "¡¡ DOCUMENTO URGENTE !!" )
+        oFR:SetText( "Text1", "!! URGENT DOCUMENT !!" )
     ELSE
-        oFR:SetVisible( "Text1", .F. ) // Ocultamos el objeto
+        oFR:SetVisible( "Text1", .F. ) // Hide the object
     ENDIF
 
-    ? "Iniciando Visualizador..."
+    ? "Launching Viewer..."
     IF .NOT. oFR:ShowPreview()
         ? "Error: " + oFR:GetLastError()
     ENDIF

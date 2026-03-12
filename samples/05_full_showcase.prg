@@ -5,76 +5,76 @@
 #endif
 
 /*
-   EJEMPLO 05: SHOWCASE COMPLETO
-   Este programa demuestra TODAS las funcionalidades del wrapper profesional:
-   - Carga de reporte
-   - Inyeccion de JSON masivo
-   - Cambio de Imagenes (PictureObject)
-   - Generacion de QR y Code128
-   - Movimiento de objetos en tiempo de ejecucion
-   - Manejo de visibilidad
-   - Exportacion y Preview
+   EXAMPLE 05: FULL SHOWCASE
+   This program demonstrates ALL the features of the professional wrapper:
+   - Report loading
+   - Bulk JSON data injection
+   - PictureObject updates
+   - QR and Code128 generation
+   - Runtime object positioning
+   - Visibility handling
+   - Export and Preview
 */
 
 FUNCTION Main()
     LOCAL oFR
     LOCAL cJson, lSuccess
-    LOCAL cLogoPath := "C:\Windows\Web\Wallpaper\Windows\img0.jpg" // Imagen por defecto de Windows
+    LOCAL cLogoPath := "C:\Windows\Web\Wallpaper\Windows\img0.jpg" // Default Windows wallpaper
 
     ? "--- hwReport FULL SHOWCASE ---"
 
     oFR := win_oleCreateObject( "hwReport.FastReport" )
     IF Empty( oFR )
-        ? "Error: No se pudo instanciar la DLL. Registro fallido?"
+        ? "Error: Could not instantiate DLL. Registration failed?"
         RETURN NIL
     ENDIF
 
-    // 1. Cargar la plantilla 'Showcase'
+    // 1. Load the 'Showcase' template
     IF .NOT. oFR:LoadReport( "05_full_showcase.frx" )
-        ? "Error al cargar reporte: " + oFR:GetLastError()
+        ? "Error loading report: " + oFR:GetLastError()
         RETURN NIL
     ENDIF
 
-    // 2. Setear Variables de Cabecera
-    oFR:SetParameter( "Title", "DEMOSTRACION INTEGRAL HARBOUR" )
+    // 2. Set Header Parameters
+    oFR:SetParameter( "Title", "FULL HARBOUR INTEGRATION DEMO" )
 
-    // 3. Inyectar Datos JSON para la Tabla
+    // 3. Inject JSON Data for the Table
     cJson := '[' + ;
-        '{"ID": "01", "Description": "Lector de Barras Laser", "Value": 120.50},' + ;
-        '{"ID": "02", "Description": "Impresora Termica 80mm", "Value": 350.00},' + ;
-        '{"ID": "03", "Description": "Bobina de Papel x10", "Value": 45.15},' + ;
-        '{"ID": "04", "Description": "Servicio de Soporte", "Value": 80.00}' + ;
+        '{"ID": "01", "Description": "Laser Barcode Scanner", "Value": 120.50},' + ;
+        '{"ID": "02", "Description": "Thermal Printer 80mm", "Value": 350.00},' + ;
+        '{"ID": "03", "Description": "Paper Roll x10", "Value": 45.15},' + ;
+        '{"ID": "04", "Description": "Support Service", "Value": 80.00}' + ;
     ']'
     oFR:RegisterJsonData( "Data", cJson )
 
-    // 4. Manipulacion de Objetos Visuales
-    ? "Configurando componentes visuales..."
+    // 4. Visual Component Manipulation
+    ? "Configuring visual components..."
 
-    // Cambiar una imagen dinamica (Logo)
+    // Dynamically change an image (Logo)
     IF File( cLogoPath )
         oFR:SetImage( "LogoImg", cLogoPath )
     ENDIF
 
-    // Cambiar QR y Codigo de Barras
+    // Update QR and Barcode data
     oFR:SetBarcode( "QrCode", "https://github.com/vszakats/harbour-core" )
     oFR:SetBarcode( "BarCode128", "SHOW-CASE-2026" )
 
-    // Mover un objeto (Título) y cambiarle el color/texto
-    oFR:SetText( "TxtTitle", "SISTEMA DE REPORTES PROFESIONAL" )
+    // Move an object (Title) and update its text
+    oFR:SetText( "TxtTitle", "PROFESSIONAL REPORTING SYSTEM" )
     
-    // 5. Demostracion de Exportacion Silenciosa
-    ? "Generando copia PDF silenciosa..."
+    // 5. Silent Export Demonstration
+    ? "Generating silent PDF copy..."
     IF oFR:ExportToPdf( "C:\harbour\contrib\hwReport\samples\Showcase_Output.pdf", .F. )
-        ? "PDF guardado en disco: Showcase_Output.pdf"
+        ? "PDF saved to disk: Showcase_Output.pdf"
     ENDIF
 
-    // 6. Lanzar Visualizador
-    ? "Lanzando Visualizador Final..."
+    // 6. Launch Viewer
+    ? "Launching Final Viewer..."
     IF .NOT. oFR:ShowPreview()
-        ? "Fallo en Visualizador: " + oFR:GetLastError()
+        ? "Viewer Failure: " + oFR:GetLastError()
     ENDIF
 
     oFR := NIL
-    ? "Showcase completado."
+    ? "Showcase completed."
 
 RETURN NIL

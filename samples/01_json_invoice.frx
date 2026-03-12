@@ -13,12 +13,12 @@
   <ReportPage Name="Page1" Watermark.Font="Arial, 60pt">
     <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="94.5">
       <ShapeObject Name="Shape1" Left="0" Top="0" Width="718.2" Height="37.8" Fill.Color="SteelBlue"/>
-      <TextObject Name="TextTitle" Left="18.9" Top="0" Width="434.7" Height="37.8" Text="FACTURA COMERCIAL" VertAlign="Center" Font="Arial, 14pt, style=Bold" TextFill.Color="White"/>
+      <TextObject Name="TextTitle" Left="18.9" Top="0" Width="434.7" Height="37.8" Text="COMMERCIAL INVOICE" VertAlign="Center" Font="Arial, 14pt, style=Bold" TextFill.Color="White"/>
       <TextObject Name="TextNum" Left="463.05" Top="0" Width="236.25" Height="37.8" Text="No: [NumFac]" HorzAlign="Right" VertAlign="Center" Font="Arial, 10pt" TextFill.Color="White"/>
-      <TextObject Name="TextClient" Left="18.9" Top="47.25" Width="302.4" Height="37.8" Text="CLIENTE: [Cliente]&#13;&#10;FECHA: [Date]" Font="Arial, 9pt"/>
+      <TextObject Name="TextClient" Left="18.9" Top="47.25" Width="302.4" Height="37.8" Text="CUSTOMER: [Cliente]&#13;&#10;DATE: [Date]" Font="Arial, 9pt"/>
     </ReportTitleBand>
     <PageHeaderBand Name="PageHeader1" Top="98.5" Width="718.2" Height="28.35">
-      <TextObject Name="HeaderDesc" Left="18.9" Width="444.15" Height="28.35" Border.Lines="Bottom" Border.Color="SteelBlue" Text="DESCRIPCION" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="HeaderDesc" Left="18.9" Width="444.15" Height="28.35" Border.Lines="Bottom" Border.Color="SteelBlue" Text="DESCRIPTION" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
       <TextObject Name="HeaderTotal" Left="472.5" Width="226.8" Height="28.35" Border.Lines="Bottom" Border.Color="SteelBlue" Text="TOTAL" HorzAlign="Right" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
     </PageHeaderBand>
     <DataBand Name="Data1" Top="130.85" Width="718.2" Height="28.35" DataSource="Items">
@@ -29,7 +29,7 @@
        <TextObject Name="TextSumTotal" Left="472.5" Top="9.45" Width="226.8" Height="28.35" Text="TOTAL: [TotalVenta]" Format="Currency" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Arial, 12pt, style=Bold" TextFill.Color="SteelBlue"/>
     </ReportSummaryBand>
     <PageFooterBand Name="PageFooter1" Top="214.45" Width="718.2" Height="28.35">
-      <TextObject Name="TextPage" Left="0" Width="718.2" Height="18.9" Text="Página [Page#] - hwReport OLE" HorzAlign="Center" Font="Arial, 8pt" TextFill.Color="Gray"/>
+      <TextObject Name="TextPage" Left="0" Width="718.2" Height="18.9" Text="Page [Page#] - hwReport OLE" HorzAlign="Center" Font="Arial, 8pt" TextFill.Color="Gray"/>
     </PageFooterBand>
   </ReportPage>
 </Report>

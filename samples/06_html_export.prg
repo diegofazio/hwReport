@@ -5,36 +5,36 @@
 #endif
 
 /*
-   EJEMPLO 06: EXPORTACION A HTML
-   Muestra como generar un archivo HTML independiente que puede ser visualizado
-   en cualquier navegador, ideal para reportes web o dashboards.
+   EXAMPLE 06: HTML EXPORT
+   Shows how to generate a standalone HTML file that can be viewed
+   in any browser, ideal for web reports or dashboards.
 */
 
 FUNCTION Main()
     LOCAL oFR
-    LOCAL cPath := "C:\harbour\contrib\hwReport\samples\Reporte_Web.html"
-    LOCAL cJson := '[{"ITEM": "WEB-1", "DESC": "Despliegue en Servidor", "TOTAL": 1200.00},' + ;
-                   '{"ITEM": "WEB-2", "DESC": "Configuracion IIS/Apache", "TOTAL": 450.00}]'
+    LOCAL cPath := "C:\harbour\contrib\hwReport\samples\Web_Report.html"
+    LOCAL cJson := '[{"ITEM": "WEB-1", "DESC": "Server Deployment", "TOTAL": 1200.00},' + ;
+                   '{"ITEM": "WEB-2", "DESC": "IIS/Apache Configuration", "TOTAL": 450.00}]'
 
-    ? "SAMPLES: Exportando a HTML..."
+    ? "SAMPLES: Exporting to HTML..."
 
     oFR := win_oleCreateObject( "hwReport.FastReport" )
     
-    // Usamos la misma plantilla de factura para demostrar la versatilidad
+    // Using the same invoice template to demonstrate versatility
     IF .NOT. oFR:LoadReport( "06_html_export.frx" )
-        ? "Error cargando reporte: " + oFR:GetLastError()
+        ? "Error loading report: " + oFR:GetLastError()
         RETURN NIL
     ENDIF
 
-    // Registramos datos y parametros
+    // Register data and parameters
     oFR:RegisterJsonData( "Items", cJson )
-    oFR:SetParameter( "Cliente", "CLIENTE WEB E-COMMERCE" )
+    oFR:SetParameter( "Cliente", "E-COMMERCE WEB CUSTOMER" )
     oFR:SetParameter( "NumFac", "W-2026-001" )
 
-    ? "Generando archivo HTML..."
+    ? "Generating HTML file..."
     IF oFR:ExportToHtml( cPath, .T. )
-        ? "EXITO: El archivo HTML se ha creado y abierto en tu navegador."
-        ? "Ruta: " + cPath
+        ? "SUCCESS: The HTML file has been created and opened in your browser."
+        ? "Path: " + cPath
     ELSE
         ? "ERROR: " + oFR:GetLastError()
     ENDIF
