@@ -46,3 +46,8 @@ The library follows a strict **1:1 mapping** between Harbour samples and FastRep
 - **Architecture**: 64-bit (x64).
 - **Runtime**: .NET Framework 4.8 (Included in Windows 10/11).
 - **Engine**: FastReport OpenSource (using native Totals for stability).
+
+---
+
+> [!NOTE]
+> **AI Built**: This entire project, including the C# binary bridge, complex XML report redesigns, and the Harbour sample gallery, was developed by **AI (Antigravity)** using **Vibe Coding** workflows.
