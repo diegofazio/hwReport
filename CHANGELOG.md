@@ -8,8 +8,10 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 - **core**: Soporte para inyección de datos vía JSON nativo de Harbour.
 - **core**: Sistema de resolución quirúrgica de ensamblados para entornos OLE restrictivos.
 - **core**: Integración con Costura.Fody para despliegue de DLL única sin dependencias.
+- **core**: Nuevo método `ExportToHtml` para generación de reportes web con imágenes incrustadas.
 - **samples**: Galería de 5 ejemplos Harbour con mapeo 1:1 a plantillas FRX.
 - **samples**: Rediseño premium de facturas y etiquetas con códigos QR y de barras.
+- **samples**: Nuevo ejemplo `06_html_export` para reportes web autónomos.
 - **tools**: Script `check_com.bat` para verificación de registro OLE.
 - **tools**: Script `Build.bat` mejorado con registro automático.
 - **docs**: Documentación completa en `README.md`, `AGENTS.md` y guía paso a paso.

@@ -29,6 +29,7 @@
 ### Execution & Exports
 - **`ShowPreview()`**: Generates a temporary PDF and opens the system's default PDF viewer.
 - **`ExportToPdf(exportPath, openAfter)`**: Exports to a specific PDF file.
+- **`ExportToHtml(exportPath, openAfter)`**: Exports to a standalone HTML file.
   - `openAfter`: `.T.` to open the file immediately, `.F.` to just save it.
 
 ## 📁 Project Structure (1:1 Mapping)
@@ -39,6 +40,7 @@ The library follows a strict **1:1 mapping** between Harbour samples and FastRep
 - `samples/03_silent_export.prg` ↔️ `03_silent_export.frx`
 - `samples/04_dynamic_objects.prg` ↔️ `04_dynamic_objects.frx`
 - `samples/05_full_showcase.prg` ↔️ `05_full_showcase.frx`
+- `samples/06_html_export.prg` ↔️ `06_html_export.frx`
 
 ## ⚙️ Architecture Notes
 - **Architecture**: 64-bit (x64).

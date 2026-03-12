@@ -18,6 +18,8 @@
 samples/*.pdf
 Reporte_Generado.pdf
 Showcase_Output.pdf
+*.files/
+samples/*.files/
 
 # Temp and logs
 *.log

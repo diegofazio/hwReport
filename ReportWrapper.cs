@@ -6,6 +6,7 @@ using System.IO;
 using System.Diagnostics;
 using FastReport;
 using FastReport.Export.PdfSimple;
+using FastReport.Export.Html;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -33,6 +34,7 @@ namespace hwReport
         // Execution
         bool ShowPreview();
         bool ExportToPdf(string exportPath, bool openAfter);
+        bool ExportToHtml(string exportPath, bool openAfter);
         bool ExportToExcel(string exportPath, bool openAfter);
     }
 
@@ -242,6 +244,37 @@ namespace hwReport
             { 
                 _lastError = ex.Message + (string.IsNullOrEmpty(debugInfo) ? "" : "\nDebug: " + debugInfo); 
                 return false; 
+            }
+        }
+
+        public bool ExportToHtml(string exportPath, bool openAfter)
+        {
+            try
+            {
+                _report.Prepare();
+                string target = exportPath;
+                if (string.IsNullOrEmpty(target))
+                {
+                    target = Path.Combine(Path.GetTempPath(), $"report_{Guid.NewGuid():N}.html");
+                }
+
+                using (var htmlExport = new HTMLExport())
+                {
+                    htmlExport.SinglePage = true;
+                    htmlExport.EmbedPictures = true;
+                    _report.Export(htmlExport, target);
+                }
+
+                if (openAfter)
+                {
+                    Process.Start(new ProcessStartInfo(target) { UseShellExecute = true });
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _lastError = "HTML Export Error: " + ex.Message;
+                return false;
             }
         }
 
