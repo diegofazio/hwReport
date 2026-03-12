@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2026-03-12] - Hash: 1b44171
+
+### Documentation
+- **skills**: Translated all project skills to technical English and renamed directories for consistency.
+- **skills**: Updated 'committer' skill rules to strictly require English commit messages.
+
+The project skills were previously documented in Spanish. This commit translates all SKILL.md files to technical English and renames the skill directories to follow a consistent English naming convention. Additionally, it updates the 'committer' skill policy to strictly require English for both commit titles and bodies.
+
+---
+
 ## [2026-03-12] - Hash: e189a58
 ### Features
 - **core**: Initial OLE/COM wrapper implementation for FastReport OpenSource.
