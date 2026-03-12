@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - **tools**: `check_com.bat` utility for OLE registration verification.
 - **tools**: Enhanced `Build.bat` with automatic administrative registration.
 - **docs**: Comprehensive documentation in `README.md`, `AGENTS.md`, and step-by-step guides.
+- **docs**: Professional technical English translation for all Harbour samples and report templates.
 - **skills**: Implementation of automated commit and documentation skills.
 
 ### Bug Fixes
