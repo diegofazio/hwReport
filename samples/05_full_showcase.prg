@@ -19,7 +19,7 @@
 FUNCTION Main()
     LOCAL oFR
     LOCAL cJson, lSuccess
-    LOCAL cLogoPath := "C:\Windows\Web\Wallpaper\Windows\img0.jpg" // Default Windows wallpaper
+    LOCAL cLogoPath := "img0.jpg" // Sample image
 
     ? "--- hwReport FULL SHOWCASE ---"
 
@@ -61,7 +61,7 @@ FUNCTION Main()
 
     // Move an object (Title) and update its text
     oFR:SetText( "TxtTitle", "PROFESSIONAL REPORTING SYSTEM" )
-    
+
     // 5. Silent Export Demonstration
     ? "Generating silent PDF copy..."
     IF oFR:ExportToPdf( "C:\harbour\contrib\hwReport\samples\Showcase_Output.pdf", .F. )

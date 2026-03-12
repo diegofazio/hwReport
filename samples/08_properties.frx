@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report ReportInfo.Created="03/12/2026 18:15:00" ReportInfo.Modified="03/12/2026 18:15:00" ReportInfo.CreatorVersion="2024.1.0.0">
+  <Dictionary/>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="37.8">
+      <TextObject Name="Text1" Left="0" Top="0" Width="718.2" Height="37.8" Text="PROPERTIES AND VISIBILITY TEST" HorzAlign="Center" VertAlign="Center" Font="Arial, 14pt, style=Bold"/>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="41.8" Width="718.2" Height="200">
+       <!-- Dynamic objects will be added here -->
+    </DataBand>
+  </ReportPage>
+</Report>

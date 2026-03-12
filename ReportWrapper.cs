@@ -23,13 +23,25 @@ namespace hwReport
         // Data Management
         bool RegisterJsonData(string dataName, string jsonContent);
         void SetParameter(string name, string value);
+        void SetCodePage(int codePage);
         
         // Component Manipulation
         bool SetText(string objectName, string text);
         bool SetImage(string objectName, string imagePath);
         bool SetBarcode(string objectName, string barcodeData);
-        bool SetPosition(string objectName, float leftCm, float topCm, float widthCm, float heightCm);
+        bool SetPosition(string objectName, float left, float top, float width, float height);
         bool SetVisible(string objectName, bool visible);
+        void SetUnits(int unitType);
+        
+        // Runtime Object Creation
+        bool AddTextObject(string bandName, string objectName, string text, float left, float top, float width, float height);
+        bool AddPictureObject(string bandName, string objectName, string imagePath, float left, float top, float width, float height);
+        
+        // Property Settings
+        bool SetFont(string objectName, string fontName, float size, bool bold, bool italic);
+        bool SetAlignment(string objectName, int horz, int vert);
+        bool SetColor(string objectName, string colorHtml);
+        bool SetTextColor(string objectName, string colorHtml);
         
         // Execution
         bool ShowPreview();
@@ -47,6 +59,8 @@ namespace hwReport
         private Report _report;
         private string _lastError = "";
         private DataSet _dataSet;
+        private float _unitMultiplier = FastReport.Utils.Units.Centimeters;
+        private int _codePage = 65001; // Default UTF-8 (Smart detection)
 
         public ReportWrapper()
         {
@@ -71,7 +85,8 @@ namespace hwReport
         {
             try
             {
-                var token = JToken.Parse(jsonContent);
+                string processedJson = ProcessString(jsonContent);
+                var token = JToken.Parse(processedJson);
                 DataTable dt = new DataTable(dataName);
 
                 if (token is JArray array)
@@ -106,14 +121,71 @@ namespace hwReport
 
         public void SetParameter(string name, string value)
         {
-            _report.SetParameterValue(name, value);
+            _report.SetParameterValue(name, ProcessString(value));
+        }
+
+        public void SetCodePage(int codePage)
+        {
+            _codePage = codePage;
+        }
+
+        private string ProcessString(string input)
+        {
+            if (string.IsNullOrEmpty(input) || _codePage == 0) return input;
+            
+            try 
+            {
+                // COM marshaling often widens ANSI/UTF-8 bytes into UTF-16 chars.
+                // We use ISO-8859-1 (28591) to extract the original bytes 1:1.
+                byte[] bytes = System.Text.Encoding.GetEncoding(28591).GetBytes(input);
+                
+                // If the user expects UTF-8, we check if the bytes are actually valid UTF-8
+                // to avoid mangling strings that are already correct Unicode.
+                if (_codePage == 65001 && !IsLikelyUTF8(bytes)) return input;
+
+                return System.Text.Encoding.GetEncoding(_codePage).GetString(bytes);
+            }
+            catch { return input; }
+        }
+
+        private bool IsLikelyUTF8(byte[] bytes)
+        {
+            int i = 0;
+            bool hasMultiByte = false;
+            while (i < bytes.Length)
+            {
+                byte b = bytes[i];
+                if (b <= 0x7F) { i++; continue; }
+                if (b >= 0xC2 && b <= 0xDF) // 2-byte sequence
+                {
+                    if (i + 1 < bytes.Length && bytes[i + 1] >= 0x80 && bytes[i + 1] <= 0xBF) { i += 2; hasMultiByte = true; continue; }
+                }
+                else if (b >= 0xE0 && b <= 0xEF) // 3-byte sequence
+                {
+                    if (i + 2 < bytes.Length && bytes[i + 1] >= 0x80 && bytes[i + 1] <= 0xBF && bytes[i + 2] >= 0x80 && bytes[i + 2] <= 0xBF) { i += 3; hasMultiByte = true; continue; }
+                }
+                return false; // Not a valid UTF-8 sequence for our purposes
+            }
+            return hasMultiByte;
+        }
+
+        public void SetUnits(int unitType)
+        {
+            switch (unitType)
+            {
+                case 0: _unitMultiplier = FastReport.Utils.Units.Millimeters; break;
+                case 1: _unitMultiplier = FastReport.Utils.Units.Centimeters; break;
+                case 2: _unitMultiplier = FastReport.Utils.Units.Inches; break;
+                case 3: _unitMultiplier = FastReport.Utils.Units.HundrethsOfInch; break;
+                default: _unitMultiplier = FastReport.Utils.Units.Centimeters; break;
+            }
         }
 
         public bool SetText(string objectName, string text)
         {
             if (_report.FindObject(objectName) is TextObject obj)
             {
-                obj.Text = text;
+                obj.Text = ProcessString(text);
                 return true;
             }
             return false;
@@ -146,14 +218,14 @@ namespace hwReport
             return false;
         }
 
-        public bool SetPosition(string objectName, float leftCm, float topCm, float widthCm, float heightCm)
+        public bool SetPosition(string objectName, float left, float top, float width, float height)
         {
             if (_report.FindObject(objectName) is ReportComponentBase obj)
             {
-                obj.Left = leftCm * FastReport.Utils.Units.Centimeters;
-                obj.Top = topCm * FastReport.Utils.Units.Centimeters;
-                obj.Width = widthCm * FastReport.Utils.Units.Centimeters;
-                obj.Height = heightCm * FastReport.Utils.Units.Centimeters;
+                obj.Left = left * _unitMultiplier;
+                obj.Top = top * _unitMultiplier;
+                obj.Width = width * _unitMultiplier;
+                obj.Height = height * _unitMultiplier;
                 return true;
             }
             return false;
@@ -165,6 +237,99 @@ namespace hwReport
             {
                 obj.Visible = visible;
                 return true;
+            }
+            return false;
+        }
+
+        public bool AddTextObject(string bandName, string objectName, string text, float left, float top, float width, float height)
+        {
+            try
+            {
+                BandBase band = _report.FindObject(bandName) as BandBase;
+                if (band == null) { _lastError = $"Band '{bandName}' not found."; return false; }
+
+                TextObject txt = new TextObject();
+                txt.Name = objectName;
+                txt.Text = ProcessString(text);
+                txt.Parent = band;
+                band.Objects.Add(txt); // Explicitly add to collection
+                txt.Left = left * _unitMultiplier;
+                txt.Top = top * _unitMultiplier;
+                txt.Width = width * _unitMultiplier;
+                txt.Height = height * _unitMultiplier;
+
+                return true;
+            }
+            catch (Exception ex) { _lastError = ex.Message; return false; }
+        }
+
+        public bool AddPictureObject(string bandName, string objectName, string imagePath, float left, float top, float width, float height)
+        {
+            try
+            {
+                BandBase band = _report.FindObject(bandName) as BandBase;
+                if (band == null) { _lastError = $"Band '{bandName}' not found."; return false; }
+
+                PictureObject pic = new PictureObject();
+                pic.Name = objectName;
+                if (File.Exists(imagePath)) pic.ImageLocation = imagePath;
+                pic.Parent = band;
+                band.Objects.Add(pic); // Explicitly add to collection
+                pic.Left = left * _unitMultiplier;
+                pic.Top = top * _unitMultiplier;
+                pic.Width = width * _unitMultiplier;
+                pic.Height = height * _unitMultiplier;
+
+                return true;
+            }
+            catch (Exception ex) { _lastError = ex.Message; return false; }
+        }
+
+        public bool SetFont(string objectName, string fontName, float size, bool bold, bool italic)
+        {
+            if (_report.FindObject(objectName) is TextObject obj)
+            {
+                System.Drawing.FontStyle style = System.Drawing.FontStyle.Regular;
+                if (bold) style |= System.Drawing.FontStyle.Bold;
+                if (italic) style |= System.Drawing.FontStyle.Italic;
+                obj.Font = new System.Drawing.Font(fontName, size, style);
+                return true;
+            }
+            return false;
+        }
+
+        public bool SetAlignment(string objectName, int horz, int vert)
+        {
+            if (_report.FindObject(objectName) is TextObject obj)
+            {
+                obj.HorzAlign = (HorzAlign)horz;
+                obj.VertAlign = (VertAlign)vert;
+                return true;
+            }
+            return false;
+        }
+
+        public bool SetColor(string objectName, string colorHtml)
+        {
+            var obj = _report.FindObject(objectName);
+            if (obj is ReportComponentBase comp)
+            {
+                try {
+                    comp.Fill = new SolidFill(System.Drawing.ColorTranslator.FromHtml(colorHtml));
+                    return true;
+                } catch { }
+            }
+            return false;
+        }
+
+        public bool SetTextColor(string objectName, string colorHtml)
+        {
+            if (_report.FindObject(objectName) is TextObject obj)
+            {
+                try {
+                    obj.TextColor = System.Drawing.ColorTranslator.FromHtml(colorHtml);
+                    return true;
+                } catch { }
             }
             return false;
         }

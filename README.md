@@ -18,13 +18,21 @@
   - If `jsonString` is an array `[{...}]`, it creates a table `dataName` where each key is a column.
   - If `jsonString` is an object `{}`, it creates a key/value table.
 - **`SetParameter(name, value)`**: Sets a report parameter/variable (Recommended for macros like `[VarName]`).
+- **`SetCodePage(int codePage)`**: Sets the encoding for incoming strings (Default: 65001 / UTF-8).
 
 ### Component Manipulation
 - **`SetText(objectName, text)`**: Changes the text of a `TextObject`.
 - **`SetImage(objectName, path)`**: Changes the image of a `PictureObject`.
 - **`SetBarcode(objectName, data)`**: Changes the data/text of a Barcode/QR object.
-- **`SetPosition(objectName, left, top, width, height)`**: Moves/Resizes an object (Units: Centimeters).
+- **`SetPosition(objectName, left, top, width, height)`**: Moves/Resizes an object. (Units set via `SetUnits`).
 - **`SetVisible(objectName, bool)`**: Shows or hides an object.
+- **`SetUnits(int unitType)`**: Sets measurement units (0=mm, 1=cm, 2=in, 3=1/100in).
+- **`AddTextObject(band, name, text, left, top, w, h)`**: Creates a text object at runtime.
+- **`AddPictureObject(band, name, path, left, top, w, h)`**: Creates a picture object at runtime.
+- **`SetFont(name, font, size, bold, italic)`**: Sets font properties for a text object.
+- **`SetAlignment(name, horz, vert)`**: Sets text alignment (0=Left, 1=Center, 2=Right).
+- **`SetColor(name, color)`**: Sets background color (Hex or named).
+- **`SetTextColor(name, color)`**: Sets text font color.
 
 ### Execution & Exports
 - **`ShowPreview()`**: Generates a temporary PDF and opens the system's default PDF viewer.
@@ -41,6 +49,8 @@ The library follows a strict **1:1 mapping** between Harbour samples and FastRep
 - `samples/04_dynamic_objects.prg` ↔️ `04_dynamic_objects.frx`
 - `samples/05_full_showcase.prg` ↔️ `05_full_showcase.frx`
 - `samples/06_html_export.prg` ↔️ `06_html_export.frx`
+- `samples/07_runtime_creation.prg` ↔️ `07_runtime_creation.frx`
+- `samples/08_properties.prg` ↔️ `08_properties.frx`
 
 ## ⚙️ Architecture Notes
 - **Architecture**: 64-bit (x64).
