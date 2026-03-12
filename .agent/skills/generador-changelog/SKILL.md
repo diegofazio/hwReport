@@ -43,7 +43,7 @@ description: Lee los cambios recientes del repositorio y actualiza el archivo CH
 
 4. **Actualizar CHANGELOG.md**:
    - Lee el contenido actual de `CHANGELOG.md`.
-   - La descripcion del cambio de estar en **español**.
+   - La descripcion del cambio de estar en **ingles**.
    - Inserta la nueva entrada formateada justo **debajo** del encabezado principal (`# Changelog` y su descripción), de modo que las entradas más recientes queden arriba (orden cronológico inverso).
    - Sobrescribe el archivo `CHANGELOG.md` con el nuevo contenido.
 

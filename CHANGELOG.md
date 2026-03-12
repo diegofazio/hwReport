@@ -1,24 +1,23 @@
 # Changelog
 
-Todos los cambios notables de este proyecto serán documentados en este archivo.
+All notable changes to this project will be documented in this file.
 
-## [2026-03-12] - Hash: a910e11
-### Características
-- **core**: Implementación inicial del wrapper OLE/COM para FastReport OpenSource.
-- **core**: Soporte para inyección de datos vía JSON nativo de Harbour.
-- **core**: Sistema de resolución quirúrgica de ensamblados para entornos OLE restrictivos.
-- **core**: Integración con Costura.Fody para despliegue de DLL única sin dependencias.
-- **core**: Nuevo método `ExportToHtml` para generación de reportes web con imágenes incrustadas.
-- **samples**: Galería de 5 ejemplos Harbour con mapeo 1:1 a plantillas FRX.
-- **samples**: Rediseño premium de facturas y etiquetas con códigos QR y de barras.
-- **samples**: Nuevo ejemplo `06_html_export` para reportes web autónomos.
-- **tools**: Script `check_com.bat` para verificación de registro OLE.
-- **tools**: Script `Build.bat` mejorado con registro automático.
-- **docs**: Documentación completa en `README.md`, `AGENTS.md` y guía paso a paso.
-- **skills**: Implementación de skills para automatización de commits y documentación.
+## [2026-03-12] - Hash: e189a58
+### Features
+- **core**: Initial OLE/COM wrapper implementation for FastReport OpenSource.
+- **core**: Native Harbour JSON data injection support.
+- **core**: Surgical Assembly Scanning for restricted OLE environments.
+- **core**: Costura.Fody integration for zero-dependency single-DLL deployment.
+- **core**: New `ExportToHtml` method for generating self-contained web reports with embedded images.
+- **samples**: Gallery of 6 Harbour examples with 1:1 mapping to optimized FRX templates.
+- **samples**: Professional redesign of invoice and label templates with QR and Barcode support.
+- **tools**: `check_com.bat` utility for OLE registration verification.
+- **tools**: Enhanced `Build.bat` with automatic administrative registration.
+- **docs**: Comprehensive documentation in `README.md`, `AGENTS.md`, and step-by-step guides.
+- **skills**: Implementation of automated commit and documentation skills.
 
-### Correcciones
-- **script**: Eliminación de funciones `Sum()` en scripts internos para usar Totales del Motor, evitando errores de metadatos.
-- **layout**: Corrección de solapamientos visuales en el reporte de Showcase.
+### Bug Fixes
+- **script**: Removed `Sum()` functions in internal scripts in favor of native Engine Totals to bypass metadata resolution errors.
+- **layout**: Resolved visual overlaps in the Showcase report header.
 
 ---
