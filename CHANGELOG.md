@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2026-03-12] - Hash: e331721
+
+### Features
+- **core**: Added `AddTextObject` and `AddPictureObject` for runtime report creation.
+- **core**: Added `SetUnits` to support mm, cm, in, and 1/100in.
+- **core**: Added `SetCodePage` and smart string processing with UTF-8 detection.
+- **core**: Added `SetFont`, `SetAlignment`, `SetColor`, and `SetTextColor` for runtime object styling.
+- **samples**: Added `07_runtime_creation.prg` and `08_properties.prg` (English version).
+
+### Fixes
+- **core**: Fixed visibility issue where dynamically added objects did not appear in PDF exports.
+- **build**: Fixed missing DataTable declaration error.
+
+---
+
 ## [2026-03-12] - Hash: 1b44171
 
 ### Documentation
