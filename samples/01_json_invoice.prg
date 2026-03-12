@@ -18,7 +18,7 @@ FUNCTION Main()
 
     oFR := win_oleCreateObject( "hwReport.FastReport" )
 
-    IF .NOT. oFR:LoadReport( "01_json_invoice.frx" )
+    IF !oFR:LoadReport( "01_json_invoice.frx" )
         ? "Error loading report: " + oFR:GetLastError()
         RETURN NIL
     ENDIF
@@ -33,7 +33,7 @@ FUNCTION Main()
 
     // Registering the data
     ? "Registering JSON data..."
-    IF .NOT. oFR:RegisterJsonData( "Items", cJson )
+    IF !oFR:RegisterJsonData( "Items", cJson )
         ? "JSON Error: " + oFR:GetLastError()
     ENDIF
 

@@ -19,9 +19,9 @@ FUNCTION Main()
     ? "SAMPLES: Exporting to HTML..."
 
     oFR := win_oleCreateObject( "hwReport.FastReport" )
-    
+
     // Using the same invoice template to demonstrate versatility
-    IF .NOT. oFR:LoadReport( "06_html_export.frx" )
+    IF !oFR:LoadReport( "06_html_export.frx" )
         ? "Error loading report: " + oFR:GetLastError()
         RETURN NIL
     ENDIF

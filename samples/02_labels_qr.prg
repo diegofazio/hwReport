@@ -18,7 +18,7 @@ FUNCTION Main()
 
     oFR := win_oleCreateObject( "hwReport.FastReport" )
 
-    IF .NOT. oFR:LoadReport( "02_labels_qr.frx" )
+    IF !oFR:LoadReport( "02_labels_qr.frx" )
         ? "Error: " + oFR:GetLastError()
         RETURN NIL
     ENDIF

@@ -1,4 +1,8 @@
 @echo off
+echo Generando clave criptografica (SNK) si no existe...
+powershell -ExecutionPolicy Bypass -File "GenerateKey.ps1"
+echo.
+
 dotnet build -c Release
 echo.
 echo Registrando DLL en el sistema (Requiere Admin)...

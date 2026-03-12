@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2026-03-12] - Hash: 82dbe9e
+
+### Features
+- **core**: Implemented `IReportEvents` and synchronous OLE events for dynamic callback execution.
+- **core**: Added `RegisterUserFunction` with C# script injection for native Harbour function calls within FRX.
+- **core**: Added `SetDiagnostics(bool)` method to control internal C# console logging globally.
+- **samples**: Added `09_callbacks.prg` and `09_callbacks.frx` demonstrating event-driven communication and dynamic script injection.
+- **build**: Integrated automatic Strong Name Key (`.snk`) generation and assembly signing into `hwReport.csproj` and `Build.bat` to eliminate RegAsm `RA0000` warnings.
+- **samples**: Improved syntax and error handling across multiple sample programs.
+
+---
+
 ## [2026-03-12] - Hash: e331721
 
 ### Features

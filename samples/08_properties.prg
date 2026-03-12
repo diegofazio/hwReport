@@ -2,7 +2,7 @@
 REQUEST HB_CODEPAGE_UTF8EX
 
 procedure Main()
-   local oFR, cPath
+   local oFR, cFile
 
    hb_cdpSelect( "UTF8EX" )
 
@@ -14,12 +14,9 @@ procedure Main()
       return
    endif
 
-   cPath := hb_dirBase() + "08_properties.frx"
-   if !File( cPath )
-      cPath := "08_properties.frx"
-   endif
+   cFile := "08_properties.frx"
 
-   if !oFR:LoadReport( cPath )
+   if !oFR:LoadReport( cFile )
       ? "Error loading report:", oFR:GetLastError()
       return
    endif

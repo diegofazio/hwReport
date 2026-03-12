@@ -34,6 +34,10 @@
 - **`SetColor(name, color)`**: Sets background color (Hex or named).
 - **`SetTextColor(name, color)`**: Sets text font color.
 
+### Callbacks & Diagnostics
+- **`RegisterUserFunction(name, parameters, category, description)`**: Registers a Harbour function to be called natively inside the FastReport template (`[FunctionName()]`).
+- **`SetDiagnostics(bool)`**: Enables or disables internal C# console logging.
+
 ### Execution & Exports
 - **`ShowPreview()`**: Generates a temporary PDF and opens the system's default PDF viewer.
 - **`ExportToPdf(exportPath, openAfter)`**: Exports to a specific PDF file.
@@ -51,7 +55,7 @@ The library follows a strict **1:1 mapping** between Harbour samples and FastRep
 - `samples/06_html_export.prg` ↔️ `06_html_export.frx`
 - `samples/07_runtime_creation.prg` ↔️ `07_runtime_creation.frx`
 - `samples/08_properties.prg` ↔️ `08_properties.frx`
-
+- `samples/09_callbacks.prg` ↔️ `09_callbacks.frx`
 ## ⚙️ Architecture Notes
 - **Architecture**: 64-bit (x64).
 - **Runtime**: .NET Framework 4.8 (Included in Windows 10/11).

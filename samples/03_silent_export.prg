@@ -17,8 +17,8 @@ FUNCTION Main()
     ? "SAMPLES: Exporting PDF in background..."
 
     oFR := win_oleCreateObject( "hwReport.FastReport" )
-    
-    IF .NOT. oFR:LoadReport( "03_silent_export.frx" )
+
+    IF !oFR:LoadReport( "03_silent_export.frx" )
         ? "Error loading report: " + oFR:GetLastError()
         RETURN NIL
     ENDIF

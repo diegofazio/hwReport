@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Data;
@@ -12,6 +13,15 @@ using Newtonsoft.Json.Linq;
 
 namespace hwReport
 {
+    [Guid("D8E9F0A1-B2C3-4D5E-6F7A-8B9C0D1E2F3A")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIDispatch)]
+    [ComVisible(true)]
+    public interface IReportEvents
+    {
+        [DispId(1)]
+        void OnUserFunctionCall();
+    }
+
     [Guid("A1B2C3D4-E5F6-4A1B-8C9D-E0F1A2B3C4D5")]
     [ComVisible(true)]
     [InterfaceType(ComInterfaceType.InterfaceIsIDispatch)]
@@ -24,6 +34,8 @@ namespace hwReport
         bool RegisterJsonData(string dataName, string jsonContent);
         void SetParameter(string name, string value);
         void SetCodePage(int codePage);
+        object Handler { get; set; }
+        void SetHandler(object handler);
         
         // Component Manipulation
         bool SetText(string objectName, string text);
@@ -43,6 +55,15 @@ namespace hwReport
         bool SetColor(string objectName, string colorHtml);
         bool SetTextColor(string objectName, string colorHtml);
         
+        // Callbacks
+        bool RegisterUserFunction(string name, string parameters, string category, string description);
+        bool Ping();
+        void SetDiagnostics(bool enable);
+        // Properties for Event Communication
+        string EventMethodName { get; set; }
+        object[] EventArgs { get; set; }
+        object EventResult { get; set; }
+        
         // Execution
         bool ShowPreview();
         bool ExportToPdf(string exportPath, bool openAfter);
@@ -53,14 +74,36 @@ namespace hwReport
     [Guid("B2C3D4E5-F6A1-4B2C-9D8E-F1A2B3C4D5E6")]
     [ComVisible(true)]
     [ClassInterface(ClassInterfaceType.None)]
+    [ComSourceInterfaces(typeof(IReportEvents))]
     [ProgId("hwReport.FastReport")]
     public class ReportWrapper : IReportWrapper
     {
+        public delegate void UserFunctionCallEventHandler();
+        public event UserFunctionCallEventHandler OnUserFunctionCall;
+
         private Report _report;
+        private static object _handler;
+        private static ReportWrapper _globalInstance;
         private string _lastError = "";
+        private string _instanceId = Guid.NewGuid().ToString().Substring(0, 8);
         private DataSet _dataSet;
         private float _unitMultiplier = FastReport.Utils.Units.Centimeters;
         private int _codePage = 65001; // Default UTF-8 (Smart detection)
+        private bool _bridgeEnabled = false;
+        public static bool GlobalDiagnostics { get; set; } = true;
+
+        public void SetDiagnostics(bool enable)
+        {
+            GlobalDiagnostics = enable;
+        }
+
+        // Properties for Event Communication
+        public string EventMethodName { get; set; }
+        public object[] EventArgs { get; set; }
+        public object EventResult { get; set; }
+
+        // Dynamic Functions
+        private List<string> _dynamicScripts = new List<string>();
 
         public ReportWrapper()
         {
@@ -119,14 +162,52 @@ namespace hwReport
             catch (Exception ex) { _lastError = "JSON Error: " + ex.Message; return false; }
         }
 
-        public void SetParameter(string name, string value)
+        public void SetParameter(string name, string value) => _report.SetParameterValue(name, ProcessString(value));
+
+        public void SetCodePage(int codePage) => _codePage = codePage;
+
+        public void SetHandler(object handler) 
         {
-            _report.SetParameterValue(name, ProcessString(value));
+            if (GlobalDiagnostics) {
+                Console.WriteLine("[C#] SetHandler: Instance={0}, HandlerIsNull={1}, C#Bitness={2}", 
+                    _instanceId, handler == null, Environment.Is64BitProcess ? "64" : "32");
+            }
+            _handler = handler;
+            _globalInstance = this;
+            try { AppDomain.CurrentDomain.SetData("hwReport_Handler", handler); } catch { }
         }
 
-        public void SetCodePage(int codePage)
+        public object Handler
         {
-            _codePage = codePage;
+            get { return GetHandler(); }
+            set { SetHandler(value); }
+        }
+
+        public bool Ping() 
+        {
+            object h = GetHandler();
+            if (GlobalDiagnostics) {
+                Console.WriteLine("[C#] Ping: Instance={0}, HandlerStatus={1}", 
+                    _instanceId, (h == null) ? "NULL" : "SET");
+            }
+            return h != null;
+        }
+
+        private object GetHandler()
+        {
+            if (_handler != null) return _handler;
+            try { return AppDomain.CurrentDomain.GetData("hwReport_Handler"); } catch { return null; }
+        }
+
+        public static ReportWrapper GetGlobalInstance() 
+        {
+             if (_globalInstance == null)
+             {
+                 if (GlobalDiagnostics) {
+                     Console.WriteLine("[C#] Warning: GetGlobalInstance requested but it is NULL!");
+                 }
+             }
+             return _globalInstance;
         }
 
         private string ProcessString(string input)
@@ -334,6 +415,166 @@ namespace hwReport
             return false;
         }
 
+        public bool RegisterUserFunction(string name, string parameters, string category, string description)
+        {
+            _bridgeEnabled = true;
+
+            // Generate the dynamic C# wrapper method
+            // e.g., name="FormatCurrency", parameters="object p1"
+            string paramList = parameters == null ? "" : parameters.Trim();
+            
+            // Extract just the parameter names to pass to HB.Call
+            // "object p1, string p2" -> "p1, p2"
+            string varNames = "";
+            if (!string.IsNullOrEmpty(paramList))
+            {
+                string[] parts = paramList.Split(',');
+                for (int i = 0; i < parts.Length; i++)
+                {
+                    string part = parts[i].Trim();
+                    int lastSpace = part.LastIndexOf(' ');
+                    if (lastSpace != -1)
+                    {
+                        varNames += part.Substring(lastSpace + 1);
+                        if (i < parts.Length - 1) varNames += ", ";
+                    }
+                }
+            }
+            
+            string methodDef = string.Format("\n        // Registered from Harbour: {0}\n", description) +
+                               string.Format("        public object {0}({1})\n", name, paramList) +
+                               string.Format("        {{\n            return HB.Call(\"{0}\"{1});\n        }}\n", 
+                                             name, string.IsNullOrEmpty(varNames) ? "" : ", " + varNames);
+
+            if (!_dynamicScripts.Contains(methodDef))
+            {
+                _dynamicScripts.Add(methodDef);
+            }
+
+            // Register with FastReport IDE so it shows in the "Data" tree
+            // Since we can't easily emit MethodInfo at runtime in standard .NET 4.8 without Reflection.Emit,
+            // we will rely on injecting the script. The function will be valid in the parser.
+            // (Note: To show in the Data Tree natively, we would need a pre-compiled MethodInfo, 
+            // but the FastReport compiler will compile our injected script and it will work perfectly in expressions).
+
+            return true;
+        }
+
+        private string SetupReportEnvironment()
+        {
+            _globalInstance = this; // Ensure we are tracked
+            string debugInfo = "";
+            
+            // 1. Clear and rebuild references
+            _report.ReferencedAssemblies = new string[0];
+            var refs = new List<string>();
+
+            // Force load critical assemblies
+            var forceLoad = new[] {
+                typeof(object), // mscorlib
+                typeof(System.Data.DataSet), // System.Data
+                typeof(Microsoft.CSharp.RuntimeBinder.Binder), // Microsoft.CSharp
+                typeof(System.Drawing.Image), // System.Drawing
+                typeof(System.Windows.Forms.Form), // System.Windows.Forms
+                typeof(System.Xml.XmlDocument), // System.Xml
+                _report.GetType() // FastReport
+            };
+
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                try {
+                    if (assembly.IsDynamic) continue;
+                    string loc = assembly.Location;
+                    if (!string.IsNullOrEmpty(loc) && !refs.Contains(loc)) refs.Add(loc);
+                } catch { }
+            }
+
+            string frameworkPath = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory();
+            string[] criticalNames = { "Microsoft.CSharp.dll", "System.Data.dll", "System.dll", "System.Core.dll", "System.Xml.dll", "System.Linq.dll" };
+            foreach (var name in criticalNames)
+            {
+                string fullPath = Path.Combine(frameworkPath, name);
+                if (File.Exists(fullPath) && !refs.Contains(fullPath)) refs.Add(fullPath);
+            }
+
+            _report.ReferencedAssemblies = refs.ToArray();
+            debugInfo = "Refs: " + string.Join("; ", refs);
+
+            // 2. Inject Script Bridge if enabled
+            if (_bridgeEnabled)
+            {
+                _report.SetParameterValue("HB_Instance", this);
+                if (_handler != null) _report.SetParameterValue("HB_Handler", _handler);
+                
+                // Smarter bridge: try to find the instance that has the handler
+                string bridge = @"
+        public hwReport.ReportWrapper HB 
+        { 
+            get 
+            { 
+                var inst = Report.GetParameterValue(""HB_Instance"") as hwReport.ReportWrapper;
+                if (inst == null || !inst.Ping()) inst = hwReport.ReportWrapper.GetGlobalInstance();
+                return inst;
+            } 
+        }";
+
+                // Append all dynamic user functions
+                foreach (string script in _dynamicScripts)
+                {
+                    bridge += script;
+                }
+                
+                if (string.IsNullOrEmpty(_report.ScriptText))
+                {
+                    _report.ScriptText = "using System;\nusing hwReport;\n\nnamespace FastReport\n{\n  public class ReportScript\n  {\n    " + bridge + "\n  }\n}";
+                }
+                else if (!_report.ScriptText.Contains("public hwReport.ReportWrapper HB"))
+                {
+                    int classPos = _report.ScriptText.IndexOf("public class ReportScript");
+                    if (classPos != -1)
+                    {
+                        int openBrace = _report.ScriptText.IndexOf("{", classPos);
+                        if (openBrace != -1)
+                        {
+                            _report.ScriptText = _report.ScriptText.Insert(openBrace + 1, "\n    " + bridge + "\n");
+                        }
+                    }
+                }
+            }
+
+            return debugInfo;
+        }
+
+        // Bridge method callable from FastReport Script
+        public object Call(string name, object p1 = null, object p2 = null, object p3 = null)
+        {
+            // If we have a direct handler (rare but possible), use it
+            object h = GetHandler();
+            if (h != null)
+            {
+                try {
+                    dynamic dh = h;
+                    return dh.OnUserFunctionCall(name, new object[] { p1, p2, p3 });
+                } catch { /* Fallback to Event Subsystem */ }
+            }
+
+            // Sync OLE Event
+            EventMethodName = name;
+            EventArgs = new object[] { p1, p2, p3 };
+            EventResult = null;
+
+            if (OnUserFunctionCall != null)
+            {
+                OnUserFunctionCall(); // Fire synchronous event, Harbour code will execute here
+            }
+            else
+            {
+                return "Error: Harbour did not register the event using __axRegisterHandler.";
+            }
+
+            return EventResult;
+        }
+
         public bool ShowPreview()
         {
             return ExportToPdfInternal(null, true);
@@ -349,44 +590,7 @@ namespace hwReport
             string debugInfo = "";
             try
             {
-                // Definitive fix for CS0234/CS0006 in OLE/COM + Costura environments:
-                // 1. Clear any default references that might be using "short names"
-                _report.ReferencedAssemblies = new string[0];
-                var refs = new List<string>();
-
-                // 2. Force load critical assemblies so they appear in AppDomain
-                var forceLoad = new[] {
-                    typeof(object), // mscorlib
-                    typeof(System.Data.DataSet), // System.Data
-                    typeof(Microsoft.CSharp.RuntimeBinder.Binder), // Microsoft.CSharp
-                    typeof(System.Drawing.Image), // System.Drawing
-                    typeof(System.Windows.Forms.Form), // System.Windows.Forms
-                    typeof(System.Xml.XmlDocument), // System.Xml
-                    _report.GetType() // FastReport
-                };
-
-                // 3. Collect absolute paths from currently loaded assemblies (includes Costura extractions)
-                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-                {
-                    try {
-                        if (assembly.IsDynamic) continue;
-                        string loc = assembly.Location;
-                        if (!string.IsNullOrEmpty(loc) && !refs.Contains(loc)) refs.Add(loc);
-                    } catch { }
-                }
-
-                // 4. If critical framework assemblies are still missing (not loaded yet), find them in GAC/Runtime
-                string frameworkPath = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory();
-                string[] criticalNames = { "Microsoft.CSharp.dll", "System.Data.dll", "System.dll", "System.Core.dll", "System.Xml.dll", "System.Linq.dll" };
-                foreach (var name in criticalNames)
-                {
-                    string fullPath = Path.Combine(frameworkPath, name);
-                    if (File.Exists(fullPath) && !refs.Contains(fullPath)) refs.Add(fullPath);
-                }
-
-                _report.ReferencedAssemblies = refs.ToArray();
-                debugInfo = "Refs: " + string.Join("; ", refs);
-
+                debugInfo = SetupReportEnvironment();
                 _report.Prepare();
                 string target = exportPath;
                 if (string.IsNullOrEmpty(target))
@@ -414,8 +618,10 @@ namespace hwReport
 
         public bool ExportToHtml(string exportPath, bool openAfter)
         {
+            string debugInfo = "";
             try
             {
+                debugInfo = SetupReportEnvironment();
                 _report.Prepare();
                 string target = exportPath;
                 if (string.IsNullOrEmpty(target))
@@ -438,7 +644,7 @@ namespace hwReport
             }
             catch (Exception ex)
             {
-                _lastError = "HTML Export Error: " + ex.Message;
+                _lastError = "HTML Export Error: " + ex.Message + (string.IsNullOrEmpty(debugInfo) ? "" : "\nDebug: " + debugInfo);
                 return false;
             }
         }

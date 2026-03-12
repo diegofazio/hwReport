@@ -30,7 +30,7 @@ FUNCTION Main()
     ENDIF
 
     // 1. Load the 'Showcase' template
-    IF .NOT. oFR:LoadReport( "05_full_showcase.frx" )
+    IF !oFR:LoadReport( "05_full_showcase.frx" )
         ? "Error loading report: " + oFR:GetLastError()
         RETURN NIL
     ENDIF

@@ -6,7 +6,7 @@
 
 /*
    EXAMPLE 04: DYNAMIC COMPONENT CONTROL
-   Shows how to move, resize, and hide elements based on your 
+   Shows how to move, resize, and hide elements based on your
    Harbour program logic (e.g., hide signature if not authorized).
 */
 
@@ -17,8 +17,8 @@ FUNCTION Main()
     ? "SAMPLES: Dynamic Component Control"
 
     oFR := win_oleCreateObject( "hwReport.FastReport" )
-    
-    IF .NOT. oFR:LoadReport( "04_dynamic_objects.frx" )
+
+    IF !oFR:LoadReport( "04_dynamic_objects.frx" )
         ? "Load Error: " + oFR:GetLastError()
         RETURN NIL
     ENDIF
