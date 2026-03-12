@@ -2,7 +2,7 @@
 
 Todos los cambios notables de este proyecto serán documentados en este archivo.
 
-## [2026-03-12] - Hash: initial
+## [2026-03-12] - Hash: a910e11
 ### Características
 - **core**: Implementación inicial del wrapper OLE/COM para FastReport OpenSource.
 - **core**: Soporte para inyección de datos vía JSON nativo de Harbour.
