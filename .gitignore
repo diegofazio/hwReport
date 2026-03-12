@@ -1,0 +1,31 @@
+# .NET Build artifacts
+[Oo]bj/
+[Bb]in/
+
+# Maintain compiled DLL and TLB (as requested)
+!bin/Release/net48/hwReport.dll
+!bin/Release/net48/hwReport.tlb
+
+# Harbour binaries and intermediate files
+*.exe
+*.o
+*.obj
+*.c
+*.hrb
+
+# Generated Reports and PDF exports
+*.pdf
+samples/*.pdf
+Reporte_Generado.pdf
+Showcase_Output.pdf
+
+# Temp and logs
+*.log
+*.tmp
+[Tt]emp/
+
+# IDE / System
+.vs/
+.vscode/
+Thumbs.db
+.DS_Store

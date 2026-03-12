@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report ReportInfo.Created="03/12/2026 10:00:00" ReportInfo.Modified="03/12/2026 10:00:00" ReportInfo.CreatorVersion="2024.1.0.0">
+  <Dictionary>
+    <Parameter Name="qr" DataType="System.String"/>
+    <Parameter Name="Text1" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="100" PaperHeight="50" LeftMargin="5" TopMargin="5" RightMargin="5" BottomMargin="5" Watermark.Font="Arial, 60pt">
+    <DataBand Name="Data1" Width="340.2" Height="151.2">
+      <ShapeObject Name="Shape1" Left="0" Top="0" Width="340.2" Height="28.35" Fill.Color="DarkSlateGray"/>
+      <TextObject Name="Text2" Left="9.45" Width="321.3" Height="28.35" Text="ETIQUETA DE PRODUCTO" VertAlign="Center" Font="Arial, 10pt, style=Bold" TextFill.Color="White"/>
+      
+      <BarcodeObject Name="QrFactura" Left="18.9" Top="37.8" Width="94.5" Height="94.5" Expression="[qr]" Barcode="QR Code"/>
+      
+      <TextObject Name="Text1" Left="132.3" Top="47.25" Width="189" Height="18.9" Text="[Text1]" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Text3" Left="132.3" Top="75.6" Width="189" Height="37.8" Text="Garantía de Calidad&#13;&#10;Soporte: 0800-HB-WIN" Font="Arial, 8pt" TextFill.Color="DimGray"/>
+      
+      <TextObject Name="Text4" Left="0" Top="132.3" Width="340.2" Height="18.9" Text="Fabricado con Harbour" HorzAlign="Center" Font="Arial, 6pt" TextFill.Color="LightGray"/>
+    </DataBand>
+  </ReportPage>
+</Report>

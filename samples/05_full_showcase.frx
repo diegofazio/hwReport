@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report ReportInfo.Created="03/12/2026 10:00:00" ReportInfo.Modified="03/12/2026 13:40:00" ReportInfo.CreatorVersion="2024.1.0.0">
+  <Dictionary>
+    <TableDataSource Name="Data" ReferenceName="Data" DataType="System.Int32" Enabled="true">
+      <Column Name="ID" DataType="System.String"/>
+      <Column Name="Description" DataType="System.String"/>
+      <Column Name="Value" DataType="System.Decimal"/>
+    </TableDataSource>
+    <Parameter Name="Title" DataType="System.String"/>
+    <Total Name="TotalShowcase" Expression="[Data.Value]" Evaluator="Data1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Watermark.Font="Arial, 60pt">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="170.1">
+      <ShapeObject Name="HeaderShape" Left="0" Top="0" Width="718.2" Height="47.25" Fill.Color="Navy"/>
+      <TextObject Name="TxtTitle" Left="0" Top="0" Width="718.2" Height="47.25" Text="[Title]" HorzAlign="Center" VertAlign="Center" Font="Arial, 16pt, style=Bold" TextFill.Color="White"/>
+      
+      <PictureObject Name="LogoImg" Left="18.9" Top="56.7" Width="103.95" Height="75.6" Border.Lines="All" Border.Color="Gainsboro"/>
+      
+      <TextObject Name="TxtInfo" Left="132.3" Top="56.7" Width="302.4" Height="75.6" Text="Este reporte demuestra todas las capacidades de la integracion:&#13;&#10;- Imagenes dinamicas&#13;&#10;- Codigos QR / Barras&#13;&#10;- Tablas via JSON&#13;&#10;- Manipulacion de objetos" Font="Arial, 9pt"/>
+      
+      <BarcodeObject Name="QrCode" Left="463.05" Top="56.7" Width="85.05" Height="85.05" Expression="&quot;https://harbour.github.io/&quot;" Barcode="QR Code"/>
+      <BarcodeObject Name="BarCode128" Left="557.55" Top="66.15" Width="141.75" Height="56.7" Expression="&quot;1234567890&quot;" Barcode="Code128"/>
+    </ReportTitleBand>
+    
+    <PageHeaderBand Name="PageHeader1" Top="174.1" Width="718.2" Height="28.35">
+      <TextObject Name="Text2" Left="18.9" Width="94.5" Height="28.35" Border.Lines="All" Border.Color="Gainsboro" Fill.Color="SteelBlue" Text="ID" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" TextFill.Color="White"/>
+      <TextObject Name="Text3" Left="113.4" Width="444.15" Height="28.35" Border.Lines="All" Border.Color="Gainsboro" Fill.Color="SteelBlue" Text="DESCRIPCION" VertAlign="Center" Font="Arial, 10pt, style=Bold" TextFill.Color="White"/>
+      <TextObject Name="Text4" Left="557.55" Width="141.75" Height="28.35" Border.Lines="All" Border.Color="Gainsboro" Fill.Color="SteelBlue" Text="VALOR" HorzAlign="Right" VertAlign="Center" Font="Arial, 10pt, style=Bold" TextFill.Color="White"/>
+    </PageHeaderBand>
+    
+    <DataBand Name="Data1" Top="206.45" Width="718.2" Height="28.35" DataSource="Data">
+      <TextObject Name="Text5" Left="18.9" Width="94.5" Height="28.35" Border.Lines="Bottom" Border.Color="Gainsboro" Text="[Data.ID]" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt"/>
+      <TextObject Name="Text6" Left="113.4" Width="444.15" Height="28.35" Border.Lines="Bottom" Border.Color="Gainsboro" Text="[Data.Description]" VertAlign="Center" Font="Arial, 10pt"/>
+      <TextObject Name="Text7" Left="557.55" Width="141.75" Height="28.35" Border.Lines="Bottom" Border.Color="Gainsboro" Text="[Data.Value]" Format="Currency" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Arial, 10pt"/>
+    </DataBand>
+    
+    <PageFooterBand Name="PageFooter1" Top="238.8" Width="718.2" Height="28.35">
+      <TextObject Name="Text8" Left="0" Width="718.2" Height="18.9" Text="Showcase Pro - FastReport for Harbour" HorzAlign="Center" Font="Arial, 7pt" TextFill.Color="Gray"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>
