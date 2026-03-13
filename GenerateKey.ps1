@@ -4,7 +4,7 @@ param(
 )
 
 if (-not (Test-Path $KeyFile)) {
-    Write-Host "Generando nueva clave de firma fuerte ($KeyFile)..."
+    Write-Host "Generating a new Strong Name Key ($KeyFile)..."
     $bytes = [System.Reflection.StrongNameKeyPair]::new([uri]::new("https://raw.githubusercontent.com/dotnet/runtime/main/eng/StrongNamePublicKeys/MicrosoftShared.snk").ToString()).PublicKey
     # Note: StrongNameKeyPair doesn't actually let us generate a fresh RSA key to file natively in standard .NET 4.8 without interop.
     # The pure PowerShell way without relying on sn.exe or external binaries for a self-signed snk:
@@ -30,7 +30,7 @@ public class KeyGen
         
         try {
             if (!StrongNameKeyGen(IntPtr.Zero, 0, out keyBlob, out keyBlobSize))
-                throw new Exception("Error al generar StrongNameKey");
+                throw new Exception("Error generating StrongNameKey");
                 
             byte[] bytes = new byte[keyBlobSize];
             Marshal.Copy(keyBlob, bytes, 0, (int)keyBlobSize);
@@ -44,7 +44,7 @@ public class KeyGen
     Add-Type -TypeDefinition $code
     $snkBytes = [KeyGen]::Generate()
     [System.IO.File]::WriteAllBytes((Resolve-Path .\).Path + "\" + $KeyFile, $snkBytes)
-    Write-Host "[$KeyFile] generado correctamente."
+    Write-Host "[$KeyFile] generated successfully."
 } else {
-    Write-Host "[$KeyFile] ya existe. Omitiendo generación."
+    Write-Host "[$KeyFile] already exists. Skipping generation."
 }
