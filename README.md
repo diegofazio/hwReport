@@ -9,11 +9,15 @@ The library supports both **32-bit (x86)** and **64-bit (x64)** architectures.
 ### Option A: Use Pre-compiled Binaries (Quickest)
 1. **DLLs**: Binaries are located in `dist/x86/` and `dist/x64/`.
 2. **Register**: Run `dist/x86/register.bat` or `dist/x64/register.bat` (from the respective folder) as **Administrator**.
-3. **Verify**: Run `check_com.bat` to see which architectures are registered.
+3. **Unregister**: Run `unregister.bat` as **Administrator**.
+4. **Verify**: Run `check_com.bat` to see which architectures are registered.
 
 ### Option B: Build from Source
-1. **Build & Register**: Run `build32.bat` or `build64.bat` as **Administrator**. This compiles and registers the selected architecture.
-2. **Verify**: Run `check_com.bat`.
+1. **Build & Register**: Run `build.bat` as **Administrator**. This compiles and registers BOTH architectures.
+   - Use `build32.bat` for x86 only.
+   - Use `build64.bat` for x64 only.
+2. **Unregister**: Run `unregister.bat` as **Administrator**.
+3. **Verify**: Run `check_com.bat`.
 
 ## 📂 API Reference
 
