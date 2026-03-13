@@ -12,9 +12,7 @@ The library supports both **32-bit (x86)** and **64-bit (x64)** architectures.
 3. **Verify**: Run `check_com.bat` to see which architectures are registered.
 
 ### Option B: Build from Source
-1. **Build & Register**: Run `build.bat` as **Administrator**. This compiles and registers BOTH architectures.
-   - Use `build32.bat` for x86 only.
-   - Use `build64.bat` for x64 only.
+1. **Build & Register**: Run `build32.bat` or `build64.bat` as **Administrator**. This compiles and registers the selected architecture.
 2. **Verify**: Run `check_com.bat`.
 
 ## 📂 API Reference
@@ -81,9 +79,9 @@ If you do not want to compile the source code, you can use the pre-compiled bina
 
 ### 🏗️ Build from Source
 1. **Requirements**: .NET SDK (6.0+ or Framework 4.8 targeting pack).
-2. **Build**: Run `build.bat` as **Administrator**. This will:
-   - Compile both `x86` and `x64` DLLs.
-   - Copy the binaries to `dist/x86/` and `dist/x64/`.
+2. **Build**: Run `build32.bat` or `build64.bat` as **Administrator**. This will:
+   - Compile the selected architecture DLL.
+   - Copy the binaries to `dist/x86/` or `dist/x64/`.
    - Register the COM components automatically.
 
 ## 🎨 Report Design
