@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2026-03-13] - Hash: c86de78
+
+### Features
+- **build**: Implemented a multi-architecture build system with dedicated `build32.bat` and `build64.bat` scripts.
+- **build**: Updated `hwReport.csproj` to target `AnyCPU`, enabling the DLL to operate in both 32-bit and 64-bit processes.
+- **build**: Restored and updated the main `build.bat` as a unified wrapper for full-platform builds.
+- **core**: Added `Bitness` property to the OLE interface for runtime identification of the hosting process architecture.
+- **tools**: Substantially enhanced `check_com.bat` and `test_com.vbs` to independently verify and report the registration status of both x86 and x64 architectures.
+- **dist**: Restructured distribution folders to `dist/x86/` and `dist/x64/` for improved clarity and deployment.
+
+---
+
 ## [2026-03-13] - Hash: ff545e5
 
 ### Features
