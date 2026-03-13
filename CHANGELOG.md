@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2026-03-13] - Hash: ff545e5
+
+### Features
+- **core**: Added `AddHyperlinkObject`, `SetHyperlink`, and `SetUnderline` methods for hyperlink support.
+- **samples**: Added `10_hyperlinks.prg` and `10_hyperlinks.frx` demonstrating hyperlink creation and manipulation.
+- **docs**: Updated `README.md` with hyperlink API documentation.
+
+*Note: FPX support was attempted but reverted due to persistent COM registration issues.*
+
+---
+
 ## [2026-03-12] - Hash: 82dbe9e
 
 ### Features
