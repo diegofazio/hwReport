@@ -4,8 +4,15 @@
 `hwReport.FastReport` is a professional OLE/COM wrapper for FastReport, designed for Harbour applications. It features zero-dependency runtime (via Costura), JSON data support, and advanced object manipulation.
 
 ## 🛠️ Installation & Verification
-1. **Build & Register**: Run `Build.bat` as **Administrator**. This compiles the DLL and registers the COM object.
-2. **Verify Registration**: Run `check_com.bat`. It will confirm if the OLE object `hwReport.FastReport` is correctly registered and ready to use.
+You can choose between building the library from source or using the pre-compiled **x64** binary provided in the repository.
+
+### Option A: Use Pre-compiled Binary (Quickest)
+1. **Register**: Run `dist/register.bat` as **Administrator**.
+2. **Verify**: Run `check_com.bat`.
+
+### Option B: Build from Source
+1. **Build & Register**: Run `build.bat` as **Administrator**. This compiles and registers the DLL automatically.
+2. **Verify**: Run `check_com.bat`.
 
 ## 📂 API Reference
 
