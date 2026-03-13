@@ -15,9 +15,9 @@ The library supports both **32-bit (x86)** and **64-bit (x64)** architectures.
 
 ### Option B: Build from Source
 1. **Requirements**: .NET SDK (6.0+ or Framework 4.8 targeting pack).
-2. **Build**: Run `build32.bat` (x86) or `build64.bat` (x64) as **Administrator**. This will:
+2. **Build & Register**: Run `build32.bat` (x86) or `build64.bat` (x64) as **Administrator**. These scripts will:
    - Compile the DLL and copy it to the `dist/` folder.
-   - Automatically register the COM component.
+   - **Immediately register** the COM component in your system.
    - Run `build.bat` to build and register **both** architectures at once.
 
 ### Verification
