@@ -105,6 +105,9 @@ namespace hwReport
         bool ExportToHtml(string exportPath, bool openAfter);
         [DispId(64)]
         bool ExportToExcel(string exportPath, bool openAfter);
+        
+        [DispId(70)]
+        int Bitness { get; }
     }
 
     [Guid("B2C3D4E5-F6A1-4B2C-9D8E-F1A2B3C4D5E6")]
@@ -148,6 +151,7 @@ namespace hwReport
         }
 
         public string GetLastError() => _lastError;
+        public int Bitness => Environment.Is64BitProcess ? 64 : 32;
 
         public bool LoadReport(string filePath)
         {

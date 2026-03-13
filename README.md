@@ -4,14 +4,17 @@
 `hwReport.FastReport` is a professional OLE/COM wrapper for FastReport, designed for Harbour applications. It features zero-dependency runtime (via Costura), JSON data support, and advanced object manipulation.
 
 ## 🛠️ Installation & Verification
-You can choose between building the library from source or using the pre-compiled **x64** binary provided in the repository.
+The library supports both **32-bit (x86)** and **64-bit (x64)** architectures.
 
-### Option A: Use Pre-compiled Binary (Quickest)
-1. **Register**: Run `dist/register.bat` as **Administrator**.
-2. **Verify**: Run `check_com.bat`.
+### Option A: Use Pre-compiled Binaries (Quickest)
+1. **DLLs**: Binaries are located in `dist/x86/` and `dist/x64/`.
+2. **Register**: Run `dist/x86/register.bat` or `dist/x64/register.bat` (from the respective folder) as **Administrator**.
+3. **Verify**: Run `check_com.bat` to see which architectures are registered.
 
 ### Option B: Build from Source
-1. **Build & Register**: Run `build.bat` as **Administrator**. This compiles and registers the DLL automatically.
+1. **Build & Register**: Run `build.bat` as **Administrator**. This compiles and registers BOTH architectures.
+   - Use `build32.bat` for x86 only.
+   - Use `build64.bat` for x64 only.
 2. **Verify**: Run `check_com.bat`.
 
 ## 📂 API Reference
@@ -47,6 +50,7 @@ You can choose between building the library from source or using the pre-compile
 ### Callbacks & Diagnostics
 - **`RegisterUserFunction(name, parameters, category, description)`**: Registers a Harbour function to be called natively inside the FastReport template (`[FunctionName()]`).
 - **`SetDiagnostics(bool)`**: Enables or disables internal C# console logging.
+- **`Bitness`**: Returns the architecture of the current instance (`32` or `64`).
 
 ### Execution & Exports
 - **`ShowPreview()`**: Generates a temporary PDF and opens the system's default PDF viewer.
@@ -78,19 +82,19 @@ If you do not want to compile the source code, you can use the pre-compiled bina
 ### 🏗️ Build from Source
 1. **Requirements**: .NET SDK (6.0+ or Framework 4.8 targeting pack).
 2. **Build**: Run `build.bat` as **Administrator**. This will:
-   - Compile the DLL in Release mode.
-   - Copy the binaries to the `dist` folder.
-   - Register the COM component automatically.
+   - Compile both `x86` and `x64` DLLs.
+   - Copy the binaries to `dist/x86/` and `dist/x64/`.
+   - Register the COM components automatically.
 
 ## 🎨 Report Design
 To create or modify `.frx` report templates, you can use the **FastReport Designer Community Edition**. It is a free, stand-alone report designer.
 - **Download**: [FastReport Designer Community Edition](https://fastreports.github.io/FastReport.Documentation/FastReportDesignerCommunityEdition.html)
 
 ## ⚙️ Architecture Notes
-- **Architecture**: 64-bit (x64).
+- **Architecture**: Multi-arch support (x86 and x64).
 - **Runtime**: .NET Framework 4.8 (Included in Windows 10/11).
-- **Engine**: FastReport OpenSource (using native Totals for stability).
-- **Distribution**: Binaries are kept in the `dist/` folder for immediate OLE registration.
+- **Engine**: FastReport OpenSource.
+- **Distribution**: Binaries are organized in `dist/x86/` and `dist/x64/`.
 
 ---
 
