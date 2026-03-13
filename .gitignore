@@ -2,9 +2,10 @@
 [Oo]bj/
 [Bb]in/
 
-# Maintain compiled DLL and TLB (as requested)
-!bin/Release/net48/hwReport.dll
-!bin/Release/net48/hwReport.tlb
+# Maintain compiled DLL and TLB in dist folder
+!dist/hwReport.dll
+!dist/hwReport.tlb
+!dist/register.bat
 
 # Harbour binaries and intermediate files
 *.exe

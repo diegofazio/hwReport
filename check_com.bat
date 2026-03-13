@@ -1,10 +1,10 @@
 @echo off
 setlocal
 echo ===================================================
-echo   hwReport - Verificador de Registro COM / OLE
+echo   hwReport - COM / OLE Registration Verifier
 echo ===================================================
 echo.
-echo Intentando crear el objeto "hwReport.FastReport"...
+echo Attempting to create the "hwReport.FastReport" object...
 echo.
 
 cscript //nologo test_com.vbs > nul 2>&1
@@ -13,18 +13,18 @@ if %ERRORLEVEL% EQU 0 goto :success
 goto :error
 
 :success
-echo [ OK ] El objeto se ha creado correctamente. 
-echo        La DLL esta registrada y lista para usar.
+echo [ OK ] Object created successfully. 
+echo        The DLL is registered and ready for use.
 echo.
 cscript //nologo test_com.vbs
 goto :end
 
 :error
-echo [ERROR] No se pudo crear el objeto "hwReport.FastReport".
-echo         Asegurate de haber ejecutado Build.bat o RegAsm.exe como Administrador.
+echo [ERROR] Could not create the "hwReport.FastReport" object.
+echo         Ensure Build.bat or dist\register.bat was run as Administrator.
 echo.
-echo Comando sugerido (Admin):
-echo C:\Windows\Microsoft.NET\Framework64\v4.0.30319\regasm.exe "c:\harbour\contrib\hwReport\bin\Release\net48\hwReport.dll" /codebase /tlb
+echo Suggested Command (Admin):
+echo regasm.exe "dist\hwReport.dll" /codebase /tlb
 goto :end
 
 :end

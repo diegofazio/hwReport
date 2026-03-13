@@ -56,10 +56,30 @@ The library follows a strict **1:1 mapping** between Harbour samples and FastRep
 - `samples/07_runtime_creation.prg` ↔️ `07_runtime_creation.frx`
 - `samples/08_properties.prg` ↔️ `08_properties.frx`
 - `samples/09_callbacks.prg` ↔️ `09_callbacks.frx`
+## 📂 Project Structure & Distribution
+
+### 📦 Pre-compiled Binary (Quick Start)
+If you do not want to compile the source code, you can use the pre-compiled binary provided in the repository:
+1. **Download/Clone** this repository.
+2. **Register**: Run `dist/register.bat` as **Administrator**.
+3. **Architecture**: The provided DLL is **x64**.
+
+### 🏗️ Build from Source
+1. **Requirements**: .NET SDK (6.0+ or Framework 4.8 targeting pack).
+2. **Build**: Run `build.bat` as **Administrator**. This will:
+   - Compile the DLL in Release mode.
+   - Copy the binaries to the `dist` folder.
+   - Register the COM component automatically.
+
+## 🎨 Report Design
+To create or modify `.frx` report templates, you can use the **FastReport Designer Community Edition**. It is a free, stand-alone report designer.
+- **Download**: [FastReport Designer Community Edition](https://fastreports.github.io/FastReport.Documentation/FastReportDesignerCommunityEdition.html)
+
 ## ⚙️ Architecture Notes
 - **Architecture**: 64-bit (x64).
 - **Runtime**: .NET Framework 4.8 (Included in Windows 10/11).
 - **Engine**: FastReport OpenSource (using native Totals for stability).
+- **Distribution**: Binaries are kept in the `dist/` folder for immediate OLE registration.
 
 ---
 
