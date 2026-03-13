@@ -27,47 +27,83 @@ namespace hwReport
     [InterfaceType(ComInterfaceType.InterfaceIsIDispatch)]
     public interface IReportWrapper
     {
+        [DispId(1)]
         bool LoadReport(string filePath);
+        [DispId(2)]
         string GetLastError();
         
         // Data Management
+        [DispId(3)]
         bool RegisterJsonData(string dataName, string jsonContent);
+        [DispId(4)]
         void SetParameter(string name, string value);
+        [DispId(5)]
         void SetCodePage(int codePage);
+        [DispId(6)]
         object Handler { get; set; }
+        [DispId(7)]
         void SetHandler(object handler);
         
         // Component Manipulation
+        [DispId(10)]
         bool SetText(string objectName, string text);
+        [DispId(11)]
         bool SetImage(string objectName, string imagePath);
+        [DispId(12)]
         bool SetBarcode(string objectName, string barcodeData);
+        [DispId(13)]
         bool SetPosition(string objectName, float left, float top, float width, float height);
+        [DispId(14)]
         bool SetVisible(string objectName, bool visible);
+        [DispId(15)]
         void SetUnits(int unitType);
         
         // Runtime Object Creation
+        [DispId(20)]
         bool AddTextObject(string bandName, string objectName, string text, float left, float top, float width, float height);
+        [DispId(21)]
         bool AddPictureObject(string bandName, string objectName, string imagePath, float left, float top, float width, float height);
+        [DispId(22)]
+        bool AddHyperlinkObject(string bandName, string objectName, string text, string url, float left, float top, float width, float height);
         
         // Property Settings
+        [DispId(30)]
         bool SetFont(string objectName, string fontName, float size, bool bold, bool italic);
+        [DispId(31)]
+        bool SetUnderline(string objectName, bool underline);
+        [DispId(32)]
         bool SetAlignment(string objectName, int horz, int vert);
+        [DispId(33)]
         bool SetColor(string objectName, string colorHtml);
+        [DispId(34)]
         bool SetTextColor(string objectName, string colorHtml);
+        [DispId(35)]
+        bool SetHyperlink(string objectName, string url);
         
         // Callbacks
+        [DispId(40)]
         bool RegisterUserFunction(string name, string parameters, string category, string description);
+        [DispId(41)]
         bool Ping();
+        [DispId(42)]
         void SetDiagnostics(bool enable);
+        
         // Properties for Event Communication
+        [DispId(50)]
         string EventMethodName { get; set; }
+        [DispId(51)]
         object[] EventArgs { get; set; }
+        [DispId(52)]
         object EventResult { get; set; }
         
         // Execution
+        [DispId(60)]
         bool ShowPreview();
+        [DispId(62)]
         bool ExportToPdf(string exportPath, bool openAfter);
+        [DispId(63)]
         bool ExportToHtml(string exportPath, bool openAfter);
+        [DispId(64)]
         bool ExportToExcel(string exportPath, bool openAfter);
     }
 
@@ -333,7 +369,6 @@ namespace hwReport
                 txt.Name = objectName;
                 txt.Text = ProcessString(text);
                 txt.Parent = band;
-                band.Objects.Add(txt); // Explicitly add to collection
                 txt.Left = left * _unitMultiplier;
                 txt.Top = top * _unitMultiplier;
                 txt.Width = width * _unitMultiplier;
@@ -355,13 +390,34 @@ namespace hwReport
                 pic.Name = objectName;
                 if (File.Exists(imagePath)) pic.ImageLocation = imagePath;
                 pic.Parent = band;
-                band.Objects.Add(pic); // Explicitly add to collection
                 pic.Left = left * _unitMultiplier;
                 pic.Top = top * _unitMultiplier;
                 pic.Width = width * _unitMultiplier;
                 pic.Height = height * _unitMultiplier;
 
                 return true;
+            }
+            catch (Exception ex) { _lastError = ex.Message; return false; }
+        }
+
+        public bool AddHyperlinkObject(string bandName, string objectName, string text, string url, float left, float top, float width, float height)
+        {
+            try
+            {
+                if (!AddTextObject(bandName, objectName, text, left, top, width, height)) return false;
+
+                if (_report.FindObject(objectName) is TextObject txt)
+                {
+                    txt.Hyperlink.Kind = HyperlinkKind.URL;
+                    txt.Hyperlink.Value = url;
+                    
+                    // Default link styling: Blue and Underlined
+                    txt.TextColor = System.Drawing.Color.Blue;
+                    txt.Font = new System.Drawing.Font(txt.Font, txt.Font.Style | System.Drawing.FontStyle.Underline);
+                    
+                    return true;
+                }
+                return false;
             }
             catch (Exception ex) { _lastError = ex.Message; return false; }
         }
@@ -373,7 +429,23 @@ namespace hwReport
                 System.Drawing.FontStyle style = System.Drawing.FontStyle.Regular;
                 if (bold) style |= System.Drawing.FontStyle.Bold;
                 if (italic) style |= System.Drawing.FontStyle.Italic;
+                if (obj.Font.Underline) style |= System.Drawing.FontStyle.Underline;
+                
                 obj.Font = new System.Drawing.Font(fontName, size, style);
+                return true;
+            }
+            return false;
+        }
+
+        public bool SetUnderline(string objectName, bool underline)
+        {
+            if (_report.FindObject(objectName) is TextObject obj)
+            {
+                System.Drawing.FontStyle style = obj.Font.Style;
+                if (underline) style |= System.Drawing.FontStyle.Underline;
+                else style &= ~System.Drawing.FontStyle.Underline;
+                
+                obj.Font = new System.Drawing.Font(obj.Font, style);
                 return true;
             }
             return false;
@@ -411,6 +483,17 @@ namespace hwReport
                     obj.TextColor = System.Drawing.ColorTranslator.FromHtml(colorHtml);
                     return true;
                 } catch { }
+            }
+            return false;
+        }
+
+        public bool SetHyperlink(string objectName, string url)
+        {
+            if (_report.FindObject(objectName) is ReportComponentBase obj)
+            {
+                obj.Hyperlink.Kind = HyperlinkKind.URL;
+                obj.Hyperlink.Value = url;
+                return true;
             }
             return false;
         }

@@ -36,10 +36,13 @@ You can choose between building the library from source or using the pre-compile
 - **`SetUnits(int unitType)`**: Sets measurement units (0=mm, 1=cm, 2=in, 3=1/100in).
 - **`AddTextObject(band, name, text, left, top, w, h)`**: Creates a text object at runtime.
 - **`AddPictureObject(band, name, path, left, top, w, h)`**: Creates a picture object at runtime.
+- **`AddHyperlinkObject(band, name, text, url, left, top, w, h)`**: Creates a hyperlink object (Blue/Underlined) at runtime.
 - **`SetFont(name, font, size, bold, italic)`**: Sets font properties for a text object.
 - **`SetAlignment(name, horz, vert)`**: Sets text alignment (0=Left, 1=Center, 2=Right).
 - **`SetColor(name, color)`**: Sets background color (Hex or named).
 - **`SetTextColor(name, color)`**: Sets text font color.
+- **`SetHyperlink(name, url)`**: Sets or updates the hyperlink of an object.
+- **`SetUnderline(name, bool)`**: Sets the underline style of an object.
 
 ### Callbacks & Diagnostics
 - **`RegisterUserFunction(name, parameters, category, description)`**: Registers a Harbour function to be called natively inside the FastReport template (`[FunctionName()]`).
@@ -63,6 +66,7 @@ The library follows a strict **1:1 mapping** between Harbour samples and FastRep
 - `samples/07_runtime_creation.prg` ↔️ `07_runtime_creation.frx`
 - `samples/08_properties.prg` ↔️ `08_properties.frx`
 - `samples/09_callbacks.prg` ↔️ `09_callbacks.frx`
+- `samples/10_hyperlinks.prg` ↔️ `10_hyperlinks.frx`
 ## 📂 Project Structure & Distribution
 
 ### 📦 Pre-compiled Binary (Quick Start)

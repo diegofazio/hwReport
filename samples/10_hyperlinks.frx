@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report ReportInfo.Created="03/13/2026 08:15:00" ReportInfo.Modified="03/13/2026 08:15:00" ReportInfo.CreatorVersion="2024.1.0.0">
+  <Dictionary/>
+  <ReportPage Name="Page1" Watermark.Font="Arial, 60pt">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="37.8">
+      <TextObject Name="Text1" Left="18.9" Top="9.45" Width="680.4" Height="18.9" Text="HYPERLINK SUPPORT DEMO" HorzAlign="Center" Font="Arial, 12pt, style=Bold"/>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="41.8" Width="718.2" Height="94.5">
+      <TextObject Name="txtStaticLink" Left="18.9" Top="18.9" Width="264.6" Height="18.9" Text="Static Link from Template" Font="Arial, 10pt"/>
+    </DataBand>
+  </ReportPage>
+</Report>
