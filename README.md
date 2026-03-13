@@ -1,23 +1,40 @@
 # hwReport API Documentation
 
 ## 🚀 Overview
-`hwReport.FastReport` is a professional OLE/COM wrapper for FastReport, designed for Harbour applications. It features zero-dependency runtime (via Costura), JSON data support, and advanced object manipulation.
+`hwReport.FastReport` is a professional OLE/COM wrapper for FastReport, designed for Harbour applications.
+- **Engine**: FastReport OpenSource.
+- **Runtime**: .NET Framework 4.8 (Included in Windows 10/11).
+- **Features**: Zero-dependency runtime (via Costura), JSON data support, and advanced object manipulation.
 
-## 🛠️ Installation & Verification
+## 🛠️ Getting Started
 The library supports both **32-bit (x86)** and **64-bit (x64)** architectures.
 
-### Option A: Use Pre-compiled Binaries (Quickest)
+### Option A: Pre-compiled Binaries (Quickest)
 1. **DLLs**: Binaries are located in `dist/x86/` and `dist/x64/`.
-2. **Register**: Run `dist/x86/register.bat` or `dist/x64/register.bat` (from the respective folder) as **Administrator**.
-3. **Unregister**: Run `unregister.bat` as **Administrator**.
-4. **Verify**: Run `check_com.bat` to see which architectures are registered.
+2. **Register**: Run `dist/x86/register.bat` or `dist/x64/register.bat` (based on your Harbour architecture) as **Administrator**.
 
 ### Option B: Build from Source
-1. **Build & Register**: Run `build.bat` as **Administrator**. This compiles and registers BOTH architectures.
-   - Use `build32.bat` for x86 only.
-   - Use `build64.bat` for x64 only.
-2. **Unregister**: Run `unregister.bat` as **Administrator**.
-3. **Verify**: Run `check_com.bat`.
+1. **Requirements**: .NET SDK (6.0+ or Framework 4.8 targeting pack).
+2. **Build**: Run `build32.bat` (x86) or `build64.bat` (x64) as **Administrator**. This will:
+   - Compile the DLL and copy it to the `dist/` folder.
+   - Automatically register the COM component.
+   - Run `build.bat` to build and register **both** architectures at once.
+
+### Verification
+- **Check Status**: Run `check_com.bat` to see which architectures are currently registered.
+- **Unregister**: Run `unregister.bat` as **Administrator**.
+
+## 🚀 Deployment & Runtime Requirements
+To run an application that uses `hwReport` on a client PC, ensure the following:
+
+1. **.NET Framework 4.8**: Required for COM compatibility. (Standard on Windows 10/11).
+2. **Register the DLL**:
+   - The compiled `hwReport.dll` must be registered on the client machine.
+   - Copy the `dist/x86/` or `dist/x64/` folder to the PC.
+   - Run `register.bat` as **Administrator**.
+   - **Note on `.tlb`**: The `hwReport.tlb` file is used for early-binding and events metadata. It is **not strictly required** to distribute it, as the `register.bat` will generate it automatically if it is missing.
+3. **Bitness Match**: Your Harbour application bitness (32 or 64) must match the registered version of the DLL.
+4. **Standalone**: No extra DLLs are needed (FastReport and JSON libs are embedded).
 
 ## 📂 API Reference
 
@@ -73,30 +90,9 @@ The library follows a strict **1:1 mapping** between Harbour samples and FastRep
 - `samples/08_properties.prg` ↔️ `08_properties.frx`
 - `samples/09_callbacks.prg` ↔️ `09_callbacks.frx`
 - `samples/10_hyperlinks.prg` ↔️ `10_hyperlinks.frx`
-## 📂 Project Structure & Distribution
-
-### 📦 Pre-compiled Binary (Quick Start)
-If you do not want to compile the source code, you can use the pre-compiled binary provided in the repository:
-1. **Download/Clone** this repository.
-2. **Register**: Run `dist/register.bat` as **Administrator**.
-3. **Architecture**: The provided DLL is **x64**.
-
-### 🏗️ Build from Source
-1. **Requirements**: .NET SDK (6.0+ or Framework 4.8 targeting pack).
-2. **Build**: Run `build32.bat` or `build64.bat` as **Administrator**. This will:
-   - Compile the selected architecture DLL.
-   - Copy the binaries to `dist/x86/` or `dist/x64/`.
-   - Register the COM components automatically.
-
 ## 🎨 Report Design
 To create or modify `.frx` report templates, you can use the **FastReport Designer Community Edition**. It is a free, stand-alone report designer.
 - **Download**: [FastReport Designer Community Edition](https://fastreports.github.io/FastReport.Documentation/FastReportDesignerCommunityEdition.html)
-
-## ⚙️ Architecture Notes
-- **Architecture**: Multi-arch support (x86 and x64).
-- **Runtime**: .NET Framework 4.8 (Included in Windows 10/11).
-- **Engine**: FastReport OpenSource.
-- **Distribution**: Binaries are organized in `dist/x86/` and `dist/x64/`.
 
 ---
 
