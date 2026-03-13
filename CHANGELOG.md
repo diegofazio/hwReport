@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2026-03-13] - Hash: c68f3b0
+
+### Features
+- **tools**: Added `unregister.bat` script to cleanly remove both x86 and x64 COM registrations from the system.
+- **docs**: Updated `README.md` to include unregistration steps for all installation methods.
+
+---
+
 ## [2026-03-13] - Hash: c86de78
 
 ### Features
