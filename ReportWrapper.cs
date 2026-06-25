@@ -31,7 +31,7 @@ namespace hwReport
         bool LoadReport(string filePath);
         [DispId(2)]
         string GetLastError();
-        
+
         // Data Management
         [DispId(3)]
         bool RegisterJsonData(string dataName, string jsonContent);
@@ -43,7 +43,7 @@ namespace hwReport
         object Handler { get; set; }
         [DispId(7)]
         void SetHandler(object handler);
-        
+
         // Component Manipulation
         [DispId(10)]
         bool SetText(string objectName, string text);
@@ -57,7 +57,11 @@ namespace hwReport
         bool SetVisible(string objectName, bool visible);
         [DispId(15)]
         void SetUnits(int unitType);
-        
+
+        // Barcode-specific manipulation
+        [DispId(16)]
+        bool SetBarcodeSize(string objectName, float width, float height);
+
         // Runtime Object Creation
         [DispId(20)]
         bool AddTextObject(string bandName, string objectName, string text, float left, float top, float width, float height);
@@ -65,7 +69,7 @@ namespace hwReport
         bool AddPictureObject(string bandName, string objectName, string imagePath, float left, float top, float width, float height);
         [DispId(22)]
         bool AddHyperlinkObject(string bandName, string objectName, string text, string url, float left, float top, float width, float height);
-        
+
         // Property Settings
         [DispId(30)]
         bool SetFont(string objectName, string fontName, float size, bool bold, bool italic);
@@ -79,7 +83,7 @@ namespace hwReport
         bool SetTextColor(string objectName, string colorHtml);
         [DispId(35)]
         bool SetHyperlink(string objectName, string url);
-        
+
         // Callbacks
         [DispId(40)]
         bool RegisterUserFunction(string name, string parameters, string category, string description);
@@ -87,7 +91,7 @@ namespace hwReport
         bool Ping();
         [DispId(42)]
         void SetDiagnostics(bool enable);
-        
+
         // Properties for Event Communication
         [DispId(50)]
         string EventMethodName { get; set; }
@@ -95,7 +99,7 @@ namespace hwReport
         object[] EventArgs { get; set; }
         [DispId(52)]
         object EventResult { get; set; }
-        
+
         // Execution
         [DispId(60)]
         bool ShowPreview();
@@ -105,7 +109,7 @@ namespace hwReport
         bool ExportToHtml(string exportPath, bool openAfter);
         [DispId(64)]
         bool ExportToExcel(string exportPath, bool openAfter);
-        
+
         [DispId(70)]
         int Bitness { get; }
     }
@@ -155,11 +159,11 @@ namespace hwReport
 
         public bool LoadReport(string filePath)
         {
-            try 
+            try
             {
                 if (!File.Exists(filePath)) throw new FileNotFoundException("File not found", filePath);
                 _report.Load(filePath);
-                return true; 
+                return true;
             }
             catch (Exception ex) { _lastError = ex.Message; return false; }
         }
@@ -174,7 +178,7 @@ namespace hwReport
 
                 if (token is JArray array)
                 {
-                    dt = JsonConvert.DeserializeObject<DataTable>(array.ToString());
+                    dt = BuildDataTableFromJArray(dataName, array);
                 }
                 else if (token is JObject obj)
                 {
@@ -190,11 +194,11 @@ namespace hwReport
                 {
                     dt.TableName = dataName;
                     _report.RegisterData(dt, dataName);
-                    
+
                     // Match the DataSource in the report dictionary and enable it
                     var ds = _report.GetDataSource(dataName);
                     if (ds != null) ds.Enabled = true;
-                    
+
                     return true;
                 }
                 return false;
@@ -202,14 +206,182 @@ namespace hwReport
             catch (Exception ex) { _lastError = "JSON Error: " + ex.Message; return false; }
         }
 
-        public void SetParameter(string name, string value) => _report.SetParameterValue(name, ProcessString(value));
+        /// <summary>
+        /// Builds a DataTable from a JArray, scanning ALL rows to determine
+        /// the best column type. This avoids the problem where
+        /// JsonConvert.DeserializeObject&lt;DataTable&gt; infers types from the
+        /// first row only (e.g., IVA=21 forces Int64, truncating 10.50→10).
+        /// </summary>
+        private DataTable BuildDataTableFromJArray(string tableName, JArray array)
+        {
+            DataTable dt = new DataTable(tableName);
+            if (array.Count == 0) return dt;
+
+            // 1. Collect all column names (preserving order from first item,
+            //    then appending any new columns from subsequent items).
+            List<string> colNames = new List<string>();
+            foreach (JObject item in array)
+            {
+                if (item == null) continue;
+                foreach (var prop in item.Properties())
+                {
+                    if (!colNames.Contains(prop.Name))
+                        colNames.Add(prop.Name);
+                }
+            }
+
+            if (colNames.Count == 0) return dt;
+
+            // 2. Determine the best CLR type for each column by inspecting
+            //    every non-null value across ALL rows.
+            Dictionary<string, Type> colTypes = new Dictionary<string, Type>();
+            foreach (string name in colNames)
+            {
+                bool anyFloat = false;
+                bool anyInteger = false;
+                bool anyString = false;
+
+                foreach (JObject item in array)
+                {
+                    if (item == null) continue;
+                    JToken val = item[name];
+                    if (val == null || val.Type == JTokenType.Null) continue;
+
+                    switch (val.Type)
+                    {
+                        case JTokenType.Integer:
+                            anyInteger = true;
+                            break;
+                        case JTokenType.Float:
+                            anyFloat = true;
+                            break;
+                        default:
+                            anyString = true;
+                            break;
+                    }
+                }
+
+                // Priority: if any non-numeric value exists, use string.
+                // If any float exists, use decimal (preserves fractional
+                // precision for financial data). Otherwise integer→long.
+                if (anyString)
+                    colTypes[name] = typeof(string);
+                else if (anyFloat || anyInteger)
+                    colTypes[name] = typeof(decimal);
+                else
+                    colTypes[name] = typeof(string);
+            }
+
+            // 3. Create columns with the determined types.
+            foreach (string name in colNames)
+            {
+                dt.Columns.Add(name, colTypes[name]);
+            }
+
+            // 4. Populate rows, converting values to the column's type.
+            foreach (JObject item in array)
+            {
+                if (item == null) continue;
+                DataRow row = dt.NewRow();
+                foreach (string name in colNames)
+                {
+                    JToken val = item[name];
+                    if (val == null || val.Type == JTokenType.Null)
+                    {
+                        row[name] = DBNull.Value;
+                    }
+                    else if (colTypes[name] == typeof(decimal))
+                    {
+                        row[name] = val.Value<decimal>();
+                    }
+                    else
+                    {
+                        row[name] = val.ToString();
+                    }
+                }
+                dt.Rows.Add(row);
+            }
+
+            return dt;
+        }
+
+        public void SetParameter(string name, string value)
+        {
+            string processed = ProcessString(value);
+            // Try to parse as decimal so FastReport respects Currency/Number formatting.
+            // Harbour/COM may pass numbers with either '.' or ',' as decimal separator
+            // depending on the system locale. InvariantCulture treats ',' as thousands
+            // separator, which causes "5000,25" to parse as 500025 instead of 5000.25.
+            //
+            // IMPORTANT: Only pass as numeric if the round-tripped string matches the
+            // original input. This preserves leading zeros (e.g., "001" stays "001",
+            // not 1) and other formatting that the user explicitly set as a string.
+            if (TryParseDecimalRobust(processed, out decimal numericValue))
+            {
+                // Round-trip: convert back to string and compare with original.
+                // Use "G" format to avoid scientific notation and preserve precision.
+                // Also normalize comma→dot for comparison to handle European decimals.
+                string roundTrip = numericValue.ToString("G",
+                    System.Globalization.CultureInfo.InvariantCulture);
+                string compareStr = processed.Contains(",") && !processed.Contains(".")
+                    ? processed.Replace(",", ".")
+                    : processed;
+                if (roundTrip == compareStr)
+                {
+                    _report.SetParameterValue(name, numericValue);
+                }
+                else
+                {
+                    _report.SetParameterValue(name, processed);
+                }
+            }
+            else
+            {
+                _report.SetParameterValue(name, processed);
+            }
+        }
+
+        private bool TryParseDecimalRobust(string s, out decimal result)
+        {
+            // Strategy: try InvariantCulture first (handles "5000.25").
+            // If the string contains a comma but no dot, also try replacing
+            // comma→dot to handle European-style "5000,25".
+            // This prevents InvariantCulture from misinterpreting the comma
+            // as a thousands separator.
+
+            if (decimal.TryParse(s,
+                System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture,
+                out result))
+            {
+                // Detect European decimal comma: comma present, no dot present.
+                if (s.Contains(",") && !s.Contains("."))
+                {
+                    string normalized = s.Replace(",", ".");
+                    if (decimal.TryParse(normalized,
+                        System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        out decimal corrected))
+                    {
+                        result = corrected;
+                    }
+                }
+                return true;
+            }
+
+            // Fallback: try current culture (e.g., es-AR) for comma decimal
+            return decimal.TryParse(s,
+                System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.CurrentCulture,
+                out result);
+        }
 
         public void SetCodePage(int codePage) => _codePage = codePage;
 
-        public void SetHandler(object handler) 
+        public void SetHandler(object handler)
         {
             if (GlobalDiagnostics) {
-                Console.WriteLine("[C#] SetHandler: Instance={0}, HandlerIsNull={1}, C#Bitness={2}", 
+                Console.WriteLine("[C#] SetHandler: Instance={0}, HandlerIsNull={1}, C#Bitness={2}",
                     _instanceId, handler == null, Environment.Is64BitProcess ? "64" : "32");
             }
             _handler = handler;
@@ -223,11 +395,11 @@ namespace hwReport
             set { SetHandler(value); }
         }
 
-        public bool Ping() 
+        public bool Ping()
         {
             object h = GetHandler();
             if (GlobalDiagnostics) {
-                Console.WriteLine("[C#] Ping: Instance={0}, HandlerStatus={1}", 
+                Console.WriteLine("[C#] Ping: Instance={0}, HandlerStatus={1}",
                     _instanceId, (h == null) ? "NULL" : "SET");
             }
             return h != null;
@@ -239,7 +411,7 @@ namespace hwReport
             try { return AppDomain.CurrentDomain.GetData("hwReport_Handler"); } catch { return null; }
         }
 
-        public static ReportWrapper GetGlobalInstance() 
+        public static ReportWrapper GetGlobalInstance()
         {
              if (_globalInstance == null)
              {
@@ -253,13 +425,13 @@ namespace hwReport
         private string ProcessString(string input)
         {
             if (string.IsNullOrEmpty(input) || _codePage == 0) return input;
-            
-            try 
+
+            try
             {
                 // COM marshaling often widens ANSI/UTF-8 bytes into UTF-16 chars.
                 // We use ISO-8859-1 (28591) to extract the original bytes 1:1.
                 byte[] bytes = System.Text.Encoding.GetEncoding(28591).GetBytes(input);
-                
+
                 // If the user expects UTF-8, we check if the bytes are actually valid UTF-8
                 // to avoid mangling strings that are already correct Unicode.
                 if (_codePage == 65001 && !IsLikelyUTF8(bytes)) return input;
@@ -339,6 +511,47 @@ namespace hwReport
             return false;
         }
 
+        /// <summary>
+        /// Sets the size (Width and Height) of a BarcodeObject (QR, Code128, etc.)
+        /// using the current unit system defined by SetUnits().
+        /// Default units: Centimeters.
+        /// </summary>
+        /// <param name="objectName">Name of the BarcodeObject in the report.</param>
+        /// <param name="width">New width in current units (cm default).</param>
+        /// <param name="height">New height in current units (cm default).</param>
+        /// <returns>true if the barcode object was found and resized.</returns>
+        public bool SetBarcodeSize(string objectName, float width, float height)
+        {
+            var obj = _report.FindObject(objectName);
+            if (obj == null)
+            {
+                _lastError = $"Barcode object '{objectName}' not found.";
+                return false;
+            }
+
+            if (!(obj is ReportComponentBase comp))
+            {
+                _lastError = $"Object '{objectName}' is not a resizable report component.";
+                return false;
+            }
+
+            // FastReport BarcodeObject has AutoSize=true by default (DIRECT property,
+            // NOT nested under .Barcode). UpdateAutoSize() is called during Draw()
+            // and recalculates Width/Height from the barcode engine, undoing any
+            // manual size changes. We must disable it for our Width/Height to stick.
+            try
+            {
+                var autoSizeProp = obj.GetType().GetProperty("AutoSize");
+                if (autoSizeProp != null && autoSizeProp.CanWrite)
+                    autoSizeProp.SetValue(obj, false);
+            }
+            catch { /* Non-critical: if reflection fails, still try to set size */ }
+
+            comp.Width  = width  * _unitMultiplier;
+            comp.Height = height * _unitMultiplier;
+            return true;
+        }
+
         public bool SetPosition(string objectName, float left, float top, float width, float height)
         {
             if (_report.FindObject(objectName) is ReportComponentBase obj)
@@ -414,11 +627,11 @@ namespace hwReport
                 {
                     txt.Hyperlink.Kind = HyperlinkKind.URL;
                     txt.Hyperlink.Value = url;
-                    
+
                     // Default link styling: Blue and Underlined
                     txt.TextColor = System.Drawing.Color.Blue;
                     txt.Font = new System.Drawing.Font(txt.Font, txt.Font.Style | System.Drawing.FontStyle.Underline);
-                    
+
                     return true;
                 }
                 return false;
@@ -434,7 +647,7 @@ namespace hwReport
                 if (bold) style |= System.Drawing.FontStyle.Bold;
                 if (italic) style |= System.Drawing.FontStyle.Italic;
                 if (obj.Font.Underline) style |= System.Drawing.FontStyle.Underline;
-                
+
                 obj.Font = new System.Drawing.Font(fontName, size, style);
                 return true;
             }
@@ -448,7 +661,7 @@ namespace hwReport
                 System.Drawing.FontStyle style = obj.Font.Style;
                 if (underline) style |= System.Drawing.FontStyle.Underline;
                 else style &= ~System.Drawing.FontStyle.Underline;
-                
+
                 obj.Font = new System.Drawing.Font(obj.Font, style);
                 return true;
             }
@@ -509,7 +722,7 @@ namespace hwReport
             // Generate the dynamic C# wrapper method
             // e.g., name="FormatCurrency", parameters="object p1"
             string paramList = parameters == null ? "" : parameters.Trim();
-            
+
             // Extract just the parameter names to pass to HB.Call
             // "object p1, string p2" -> "p1, p2"
             string varNames = "";
@@ -527,10 +740,10 @@ namespace hwReport
                     }
                 }
             }
-            
+
             string methodDef = string.Format("\n        // Registered from Harbour: {0}\n", description) +
                                string.Format("        public object {0}({1})\n", name, paramList) +
-                               string.Format("        {{\n            return HB.Call(\"{0}\"{1});\n        }}\n", 
+                               string.Format("        {{\n            return HB.Call(\"{0}\"{1});\n        }}\n",
                                              name, string.IsNullOrEmpty(varNames) ? "" : ", " + varNames);
 
             if (!_dynamicScripts.Contains(methodDef))
@@ -541,7 +754,7 @@ namespace hwReport
             // Register with FastReport IDE so it shows in the "Data" tree
             // Since we can't easily emit MethodInfo at runtime in standard .NET 4.8 without Reflection.Emit,
             // we will rely on injecting the script. The function will be valid in the parser.
-            // (Note: To show in the Data Tree natively, we would need a pre-compiled MethodInfo, 
+            // (Note: To show in the Data Tree natively, we would need a pre-compiled MethodInfo,
             // but the FastReport compiler will compile our injected script and it will work perfectly in expressions).
 
             return true;
@@ -551,7 +764,7 @@ namespace hwReport
         {
             _globalInstance = this; // Ensure we are tracked
             string debugInfo = "";
-            
+
             // 1. Clear and rebuild references
             _report.ReferencedAssemblies = new string[0];
             var refs = new List<string>();
@@ -592,17 +805,17 @@ namespace hwReport
             {
                 _report.SetParameterValue("HB_Instance", this);
                 if (_handler != null) _report.SetParameterValue("HB_Handler", _handler);
-                
+
                 // Smarter bridge: try to find the instance that has the handler
                 string bridge = @"
-        public hwReport.ReportWrapper HB 
-        { 
-            get 
-            { 
+        public hwReport.ReportWrapper HB
+        {
+            get
+            {
                 var inst = Report.GetParameterValue(""HB_Instance"") as hwReport.ReportWrapper;
                 if (inst == null || !inst.Ping()) inst = hwReport.ReportWrapper.GetGlobalInstance();
                 return inst;
-            } 
+            }
         }";
 
                 // Append all dynamic user functions
@@ -610,7 +823,7 @@ namespace hwReport
                 {
                     bridge += script;
                 }
-                
+
                 if (string.IsNullOrEmpty(_report.ScriptText))
                 {
                     _report.ScriptText = "using System;\nusing hwReport;\n\nnamespace FastReport\n{\n  public class ReportScript\n  {\n    " + bridge + "\n  }\n}";
@@ -684,7 +897,7 @@ namespace hwReport
                 {
                     target = Path.Combine(Path.GetTempPath(), $"report_{Guid.NewGuid():N}.pdf");
                 }
-                
+
                 using (var pdfExport = new PDFSimpleExport())
                 {
                     _report.Export(pdfExport, target);
@@ -696,10 +909,10 @@ namespace hwReport
                 }
                 return true;
             }
-            catch (Exception ex) 
-            { 
-                _lastError = ex.Message + (string.IsNullOrEmpty(debugInfo) ? "" : "\nDebug: " + debugInfo); 
-                return false; 
+            catch (Exception ex)
+            {
+                _lastError = ex.Message + (string.IsNullOrEmpty(debugInfo) ? "" : "\nDebug: " + debugInfo);
+                return false;
             }
         }
 

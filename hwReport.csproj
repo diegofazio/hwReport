@@ -8,6 +8,16 @@
     <AssemblyOriginatorKeyFile>hwReport.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
+  <!-- Platform-specific output paths for x86/x64 builds -->
+  <PropertyGroup Condition="'$(PlatformTarget)' == 'x64'">
+    <OutputPath>bin\x64\$(Configuration)\net48\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(PlatformTarget)' == 'x86'">
+    <OutputPath>bin\x86\$(Configuration)\net48\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
 
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />

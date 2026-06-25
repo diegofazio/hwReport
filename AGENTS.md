@@ -43,14 +43,21 @@ When creating objects via `oFR:AddTextObject()` or `oFR:AddPictureObject()`:
 - **Units**: The wrapper uses **Centimeters** by default.
 - **Naming**: Ensure `objectName` is unique to avoid overwriting existing layout elements.
 
-### 3. Native Function Registration
+### 3. Barcode / QR Size Manipulation
+Use `oFR:SetBarcodeSize("ObjectName", nWidth, nHeight)` to resize QR or Barcode objects at runtime.
+- **Units**: Respects the unit system set via `SetUnits()` (default: Centimeters).
+- **Scope**: Targets `BarcodeObject` instances by name. Falls back to any `ReportComponentBase` if the barcode type detection fails.
+- **Related**: Use `SetPosition()` to also move the barcode; use `SetBarcode()` to set the barcode data string.
+- **Example**: `oFR:SetBarcodeSize("QrFactura", 2.5, 2.5)` — sets QR to 2.5×2.5 cm.
+
+### 4. Native Function Registration
 Use `oFR:RegisterUserFunction("MyFunc", "object p1", ...)` to inject Harbour functions as native C# methods into the report script.
 - **Reserved Names**: Avoid naming your Harbour functions as `FormatCurrency` or `Sum`, as they conflict with FastReport's internal methods (causing `CS0111`). Prefix them (e.g., `HbFormatCurrency`).
 
-### 4. Assembly Resolution (Metadata Errors)
+### 5. Assembly Resolution (Metadata Errors)
 The `ReportWrapper.cs` includes a "Surgical Assembly Scan" that manually injects absolute paths for critical DLLs like `mscorlib.dll` and `Microsoft.CSharp.dll` into the `ReferencedAssemblies` list to bypass `CS0006` errors.
 
-### 5. Data Injections
+### 6. Data Injections
 - **Parameters**: Use `oFR:SetParameter("Name", "Value")`.
 - **JSON Tables**: Use `oFR:RegisterJsonData("TableName", cJsonString)`.
 
