@@ -53,6 +53,7 @@ To run an application that uses `hwReport` on a client PC, ensure the following:
 - **`SetText(objectName, text)`**: Changes the text of a `TextObject`.
 - **`SetImage(objectName, path)`**: Changes the image of a `PictureObject`.
 - **`SetBarcode(objectName, data)`**: Changes the data/text of a Barcode/QR object.
+- **`SetBarcodeSize(objectName, width, height)`**: Resizes a Barcode/QR object using current units (default: cm). Disables AutoSize for manual control.
 - **`SetPosition(objectName, left, top, width, height)`**: Moves/Resizes an object. (Units set via `SetUnits`).
 - **`SetVisible(objectName, bool)`**: Shows or hides an object.
 - **`SetUnits(int unitType)`**: Sets measurement units (0=mm, 1=cm, 2=in, 3=1/100in).
