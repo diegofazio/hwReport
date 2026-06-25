@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2026-06-25] - Hash: e1354f9
+
+### Features
+- **core**: Added `SetBarcodeSize` OLE method (DispId 16) for runtime barcode/QR dimension control with AutoSize disable.
+- **core**: Implemented robust decimal parsing (`TryParseDecimalRobust`) handling both dot and comma decimal separators for European locales.
+- **core**: Enhanced `SetParameter` with round-trip verification to preserve leading zeros and string formatting.
+- **core**: Replaced `JsonConvert.DeserializeObject<DataTable>` with `BuildDataTableFromJArray` that scans ALL rows for column type inference, preventing decimal truncation.
+- **build**: Added pre-build cleanup to build scripts (unregister COM, kill stale processes, `dotnet clean`).
+- **build**: Added platform-specific output paths in `hwReport.csproj` for x86/x64 builds.
+- **build**: Updated `dist/register.bat` scripts with pre-unregister step and new per-architecture `unregister.bat` files.
+- **docs**: Added Barcode/QR Size Manipulation section to `AGENTS.md`.
+- **chore**: Migrated skills directory from `.agent/skills/` to `.agents/skills/`.
+
+---
+
 ## [2026-03-13] - Hash: c68f3b0
 
 ### Features
